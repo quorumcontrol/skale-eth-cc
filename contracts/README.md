@@ -13,7 +13,11 @@ Battle.sol
 GameItems.ol
 
 ### To Do
-
+- [x] IGameItems.sol
+    - [x] Craft Function
+    - [x] GetOnChainToken Function
+    - [x] Initial Mint Function
+    - [x] Toggle Lock Function
 - [ ] GameItems.sol
     - [ ] ADMIN_ROLE - ?? - @Topper?
     - [ ] WIN_MANAGER_ROLE - ?? - Give Ability to Mint a single NFT on a Win if it does not already exists
