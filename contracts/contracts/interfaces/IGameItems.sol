@@ -13,7 +13,7 @@ interface IGameItems {
 
     function craft(uint256 itemId, uint256 item2Id) external;
     function getOnChainToken(uint256 tokenId) external returns (GameItemMetadata memory);
+    function getUnlockDate() external returns (uint256);
     function initialMint(address receiver) external;
-    function toggleLock() external;
-    
+    function isLocked() external returns (bool);
 }

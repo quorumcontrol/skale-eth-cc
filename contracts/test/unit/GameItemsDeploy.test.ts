@@ -18,36 +18,36 @@ describe("Game Items Deployment Test", () => {
         return { factory, contract, owner, ADMIN_ROLE, WIN_MANAGER_ROLE, MINTER_ROLE }
     }
 
-    xdescribe("Deploy and Role Checks", () => {
-        xit("Should Assign ADMIN_ROLE to Owner", async() => {
+    describe("Deploy and Role Checks", () => {
+        it("Should Assign ADMIN_ROLE to Owner", async() => {
           const { ADMIN_ROLE, contract, owner } = await loadFixture(deployContractFixture);
-          expect(await contract.hasRole(ADMIN_ROLE, owner).to.be.true);
+          expect(await contract.hasRole(ADMIN_ROLE, owner.address)).to.be.true;
         })
-        xit("Should have Length of 1 for ADMIN_ROLE", async() => {
+        it("Should have Length of 1 for ADMIN_ROLE", async() => {
           const { ADMIN_ROLE, contract } = await loadFixture(deployContractFixture);
           expect(Number(await contract.callStatic.getRoleMemberCount(ADMIN_ROLE))).to.be.equal(1);
         })
-        xit("Should Assign MINTER_ROLE to Owner", async() => {
+        it("Should Assign MINTER_ROLE to Owner", async() => {
           const { MINTER_ROLE, contract, owner } = await loadFixture(deployContractFixture);
-          expect(await contract.hasRole(MINTER_ROLE, owner).to.be.true);
+          expect(await contract.hasRole(MINTER_ROLE, owner.address)).to.be.true;
         })
-        xit("Should have Length of 1 for MINTER_ROLE", async() => {
+        it("Should have Length of 1 for MINTER_ROLE", async() => {
           const { MINTER_ROLE, contract } = await loadFixture(deployContractFixture);
           expect(Number(await contract.callStatic.getRoleMemberCount(MINTER_ROLE))).to.be.equal(1);
         })
-        xit("Should Have Length of 0 for WIN_MANAGER_ROLE", async() => {
+        it("Should Have Length of 0 for WIN_MANAGER_ROLE", async() => {
           const { WIN_MANAGER_ROLE, contract } = await loadFixture(deployContractFixture);
-          expect(Number(await contract.callStatic.getRoleMemberCount(WIN_MANAGER_ROLE))).to.be.equal(1);
+          expect(Number(await contract.callStatic.getRoleMemberCount(WIN_MANAGER_ROLE))).to.be.equal(0);
         })
     })
-    xdescribe("Conference Checks", () => {
+    describe("Conference Checks", () => {
         it("Transfer Should be Locked", async() => {
             const { contract } = await loadFixture(deployContractFixture);
-            expect(await contract.callStatic.isLocked()).to.be.true;
+            expect(await contract.callStatic.isLocked()).to.be.equal(new Date().getTime() / 1000 < 1658451660 ? true : false);
         })
-        // xit("Transfer Should be locked until X", async() => {
-        //     const { contract } = await loadFixture(deployContractFixture);
-        //     expect(await contract.callStatic.lockedUntil()).to.be.equal
-        // })
+        it("Should have Unlock Date === 1658451660", async() => {
+          const { contract } = await loadFixture(deployContractFixture);
+          expect(await contract.callStatic.getUnlockDate()).to.be.equal(1658451660);
+        })
     })
 })
