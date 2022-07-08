@@ -11,5 +11,9 @@ interface IGameItems {
         uint256[] combined; // items which can be burnt together to create this item.
     }
 
-    function itemDetails(uint256 tokenID) external view returns (GameItemMetadata memory);
+    function craft(uint256 itemId, uint256 item2Id) external;
+    function getOnChainToken(uint256 tokenId) external returns (GameItemMetadata memory);
+    function initialMint(address receiver) external;
+    function toggleLock() external;
+    
 }
