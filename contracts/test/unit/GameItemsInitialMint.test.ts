@@ -45,9 +45,21 @@ describe("Game Items Initial Mint Test", () => {
         await expect(
             contract.addItem("5", "5", "5", "5", [], [], "")
         ).to.emit(contract, "NewItem").withArgs(BigNumber.from(5))
+        
+        /// This Section Mints and Works
+        /// Unit Testing will be awkward and contract calls off if not using SKALE
+
+
         /// This may not work without a SKALE chain
+        await contract.initialMint(rng1.address);
         // await expect(
         //     contract.initialMint(rng1.address)
-        // ).to.emit(contract, "NewPlayer").withArgs(rng1.address, [0, 2, 4] || [1,3,5], undefined)
+        // ).to.emit(contract, "NewPlayer").withArgs(rng1.address, [0, 2, 4] || [1,3,5], 0)
+        console.log("0: ", await contract.callStatic.balanceOf(rng1.address, BigNumber.from(0)));
+        console.log("1: ", await contract.callStatic.balanceOf(rng1.address, BigNumber.from(1)));
+        console.log("2: ", await contract.callStatic.balanceOf(rng1.address, BigNumber.from(2)));
+        console.log("3: ", await contract.callStatic.balanceOf(rng1.address, BigNumber.from(3)));
+        console.log("4: ", await contract.callStatic.balanceOf(rng1.address, BigNumber.from(4)));
+        console.log("5: ", await contract.callStatic.balanceOf(rng1.address, BigNumber.from(5)));
     })
 })

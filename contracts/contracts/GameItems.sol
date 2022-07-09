@@ -211,7 +211,8 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
 
     /// @notice SKALE RNG Casting
     function _getRandomNumber() internal view returns (uint256) {
-        return uint256(_randomNumberGenerator()) % 1000 < 500 ? 1 : 0;
+        uint256 _rng = uint256(_randomNumberGenerator()) % 1000;
+        return _rng < 500 ? 1 : 0;
     }
 
     /// @notice SKALE RNG (CHECK!)
