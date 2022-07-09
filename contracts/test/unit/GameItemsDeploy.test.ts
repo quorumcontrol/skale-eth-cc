@@ -50,4 +50,25 @@ describe("Game Items Deployment Test", () => {
           expect(await contract.callStatic.getUnlockDate()).to.be.equal(1658451660);
         })
     })
+    describe("Default Metadata", () => {
+      it("GetItems Function Length of 3", async() =>{
+        const { contract } = await loadFixture(deployContractFixture);
+        const items = await contract.callStatic.getItems("0x0000000000000000000000000000000001000001");
+        expect(items.length).to.be.equal(3);
+      })
+      it("Should Provide Empty Fields", async() => {
+        const { contract } = await loadFixture(deployContractFixture);
+        const items = await contract.callStatic.getItems("0x0000000000000000000000000000000001000001");
+        for (const item of items) {
+          expect(item[0]).to.be.equal('');
+          expect(item[0]).lengthOf(0);
+          expect(item[1]).to.be.equal('');
+          expect(item[1]).lengthOf(0);
+          expect(item[2]).to.be.equal('');
+          expect(item[2]).lengthOf(0);
+          expect(item[3]).to.be.equal('');
+          expect(item[3]).lengthOf(0);
+        }
+      })
+    })
 })
