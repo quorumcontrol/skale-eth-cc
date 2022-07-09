@@ -33,9 +33,20 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
 
     /// @notice Modifier Error String
     string private constant ACCESS_DENIED = "Access Denied";
+    /// @notice InActive Error String
+    string private constant CONTRACT_IN_ACTIVE = "Not Enough Items";
+    /// @notice Invalid New Player - Already Has NFTs
+    string private constant INVALID_NEW_PLAYER = "Already Playing";
+    /// @notice Not an Item
+    string private constant ITEM_DOES_NOT_EXIST = "Item Does Not Exist";
+    /// @notice User Does Not Have Item
+    string private constant USER_NO_ITEM = "Missing an item";
 
     /// @notice Unlock Date After Etherum CC is Over
     uint256 private unlockDate = 1658451660;
+
+    event NewPlayer(address indexed newPlayer, uint256[3] indexed initialTokens, uint256 indexed timestamp);
+    event Combined(address indexed creator, uint256 indexed tokenId, uint256 indexed timestamp);
 
     constructor() ERC1155("GameItems") {
         _setupRole(ADMIN_ROLE, msg.sender);
@@ -65,17 +76,18 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
         numberItems = numberItems + 1;
     }
 
-    function craft(uint256 itemId, uint256 item2Id) external {}
+    function combine(uint256 newItemId) override external {
+        require(newItemId <= numberItems, ITEM_DOES_NOT_EXIST);
+        GameItemMetadata storage item = metadata[newItemId];
+        for (uint256 i = 0; i < item.combined.length; i++) {
+            require(balanceOf(msg.sender, item.combined[i]) >= 1, USER_NO_ITEM);
+        }
+        _internalMint(msg.sender, newItemId);
+        emit Combined(msg.sender, newItemId, block.timestamp);
+    }
 
-    function getOnChainToken(uint256 tokenId)  external  pure  returns (GameItemMetadata memory) { 
-        return GameItemMetadata(
-                "",
-                "",
-                "",
-                "",
-                new uint256[](2),
-                new uint256[](2)
-            );
+    function getOnChainToken(uint256 tokenId)  external view  returns (GameItemMetadata memory) { 
+        return metadata[tokenId];
     }
 
     function getItems(address _address) override external view returns (GameItemMetadata[] memory) {
@@ -96,7 +108,16 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
         return unlockDate;
     }
 
-    function initialMint(address receiver) external {}
+    function initialMint(address receiver) override external onlyMinter {
+        require(numberItems == 12, CONTRACT_IN_ACTIVE);
+        require(_noBalances(receiver), INVALID_NEW_PLAYER);
+        uint256 _rng = _getRandomNumber();
+        uint256[3] memory tokenIds = _rng == 0 ? [uint256(1), 3, 5] : [uint256(2), 4, 6];
+        for (uint256 i = 0; i < 3; i++) {
+            _internalMint(receiver, tokenIds[i]);
+        }
+        emit NewPlayer(receiver, tokenIds, block.timestamp);
+    }
 
     /// @notice Checks if contract is locked
     /// @dev Internal/External
@@ -106,9 +127,33 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
         return block.timestamp <= unlockDate;
     }
 
-    function _internalMint() external {}
+    function _internalMint(address receiver, uint256 tokenId) internal {
+        _mint(receiver, tokenId, 1, "");
+    }
 
     function supportsInterface(bytes4 interfaceId) public view override (AccessControlEnumerable, ERC1155, IERC165) returns (bool) {
         return super.supportsInterface(interfaceId);
+    }
+
+    function _noBalances(address checkFor) internal view returns (bool) {
+        for (uint256 i = 0; i < numberItems; i++) {
+            if (balanceOf(checkFor, i) > 0) return false;
+        }
+        return true;
+    }
+
+    function _getRandomNumber() internal view returns (uint256) {
+        return uint256(_randomNumberGenerator()) % 1000 < 500 ? 1 : 0;
+    }
+
+    function _randomNumberGenerator() internal view returns (bytes32 addr) {
+        assembly {
+            let freemem := mload(0x40)
+            let start_addr := add(freemem, 0)
+            if iszero(staticcall(gas(), 0x18, 0, 0, start_addr, 32)) {
+              invalid()
+            }
+            addr := mload(freemem)
+        }
     }
 }

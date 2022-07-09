@@ -14,7 +14,7 @@ interface IGameItems is IERC1155 {
     }
 
     function addItem(string memory name, string memory description, string memory image, string memory animation, uint256[] memory beats, uint256[] memory combined, string memory tokenURI) external;
-    function craft(uint256 itemId, uint256 item2Id) external;
+    function combine(uint256 newItemId) external;
     function getOnChainToken(uint256 tokenId) external returns (GameItemMetadata memory);
     function getItems(address _address) external returns (GameItemMetadata[] memory);
     function getUnlockDate() external returns (uint256);
