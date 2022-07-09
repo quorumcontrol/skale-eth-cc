@@ -1,16 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-// import "@openzeppelin/contracts/token/ERC1155.sol";
-// // import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
-// import "@openzeppelin/contracts/access/AccessControl.sol";
-// import "./interfaces/IGameItems.sol";
-
-
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155URIStorage.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 import "./interfaces/IGameItems.sol";
-import "hardhat/console.sol";
+
 /**
 *
 * GameItems for ETH CC
