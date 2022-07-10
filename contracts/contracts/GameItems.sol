@@ -67,6 +67,7 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
     event Combined(address indexed creator, uint256 indexed tokenId, uint256 indexed timestamp);
 
     constructor() ERC1155("GameItems") {
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, msg.sender);
         _setupRole(MINTER_ROLE, msg.sender);
         numberItems = 0;
@@ -150,6 +151,10 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
         return numberPlayers;
     }
 
+    function getNumberItems() external view onlyWinManager returns (uint256) {
+        return numberItems;
+    }
+
     /// @notice Retreives Unlock Date
     /// @dev Can be deprecated
     /// @return uint256 time in epoch * 1000
@@ -220,4 +225,5 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
             addr := mload(freemem)
         }
     }
+    
 }
