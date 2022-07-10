@@ -56,8 +56,8 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
     /// @dev All Tokens Minted will be equal to 1
     /// @param newPlayer The [newPlayer]that was added by address
     /// @param initialTokens The [initialTokens] that were added EXACT === 3
-    /// @param timestamp The [timestamp] of the new player joining
-    event NewPlayer(address indexed newPlayer, uint256[3] indexed initialTokens, uint256 indexed timestamp);
+    // @param timestamp The [timestamp] of the new player joining
+    event NewPlayer(address indexed newPlayer, uint256[3] indexed initialTokens);
 
     /// @notice Emits a new item being added given to the player on successfull combination
     /// @dev Used in the [combine] function
@@ -67,6 +67,7 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
     event Combined(address indexed creator, uint256 indexed tokenId, uint256 indexed timestamp);
 
     constructor() ERC1155("GameItems") {
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, msg.sender);
         _setupRole(MINTER_ROLE, msg.sender);
         numberItems = 0;
@@ -88,6 +89,12 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
     /// @notice Only Win Manager -> Call via Proxy
     modifier onlyWinManager() {
         require(hasRole(WIN_MANAGER_ROLE, msg.sender), ACCESS_DENIED);
+        _;
+    }
+
+    /// @notice Additional Modifier to Allow Shared Access
+    modifier onlyViewNumberItems() {
+        require(hasRole(WIN_MANAGER_ROLE, msg.sender) || hasRole(ADMIN_ROLE, msg.sender), ACCESS_DENIED);
         _;
     }
     /// @notice Admin Function that enables the admin owner to add new tokens to the contract storage
@@ -150,6 +157,10 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
         return numberPlayers;
     }
 
+    function getNumberItems() external view onlyViewNumberItems returns (uint256) {
+        return numberItems;
+    }
+
     /// @notice Retreives Unlock Date
     /// @dev Can be deprecated
     /// @return uint256 time in epoch * 1000
@@ -157,9 +168,11 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
         return unlockDate;
     }
 
+    /// @dev Initial Mint Function
+    /// @dev Only Callalble by MINTER_ROLE
+    /// @dev Emits [NewPlayer] event and adds a new player
+    /// @param receiver the individual receiving the intial mint
     function initialMint(address receiver) override external onlyMinter {
-        //// TESTING VALUE === 6
-        require(numberItems == 6, CONTRACT_IN_ACTIVE); /// PRODUCTION VALUE === require(numberItems == 12, CONTRACT_IN_ACTIVE);
         require(_noBalances(receiver), INVALID_NEW_PLAYER);
         uint256 _rng = _getRandomNumber();
         uint256[3] memory tokenIds = _rng == 0 ? [uint256(0), 2, 4] : [uint256(1), 3, 5];
@@ -167,7 +180,7 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
             _internalMint(receiver, tokenIds[i]);
         }
         numberPlayers++;
-        emit NewPlayer(receiver, tokenIds, block.timestamp);
+        emit NewPlayer(receiver, tokenIds);
     }
 
     /// @notice Checks if contract is locked
@@ -220,4 +233,5 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
             addr := mload(freemem)
         }
     }
+    
 }
