@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ethers } from 'hardhat';
+import { BigNumber } from 'ethers';
 
 describe("Battle Deployment Test", () => {
     
@@ -33,6 +34,30 @@ describe("Battle Deployment Test", () => {
         it("Should have Game Items Contract Set", async() => {
             const { contract, contract2 } = await loadFixture(deployContractFixture);
             expect(await contract2.callStatic.getGameItemContract()).to.be.equal(contract.address);
+        })
+        it("Commitment Should Be Empty", async() => {
+            const EMPTY_COMMIT: string = "0x0000000000000000000000000000000000000000000000000000000000000000";
+            const { contract2, rng1, rng2 } = await loadFixture(deployContractFixture);
+            const commit1 = await contract2.callStatic.getCommitment(rng1.address);
+            const commit2 = await contract2.callStatic.getCommitment(rng2.address);
+            expect(commit1).to.be.equal(EMPTY_COMMIT);
+            expect(commit2).to.be.equal(EMPTY_COMMIT);
+        })
+        it("Record Should Be Empty", async() => {
+            const EMPTY_RECORD: BigNumber = BigNumber.from(0);
+            const { contract2, rng1, rng2 } = await loadFixture(deployContractFixture);
+            const record1 = await contract2.callStatic.getRecord(rng1.address);
+            const record2 = await contract2.callStatic.getRecord(rng2.address);
+            expect(record1).to.be.length(4);
+            expect(record2).to.be.length(4);
+            expect(record1[0]).to.be.equal(EMPTY_RECORD);
+            expect(record1[1]).to.be.equal(EMPTY_RECORD);
+            expect(record1[2]).to.be.equal(EMPTY_RECORD);
+            expect(record1[3]).to.be.equal(EMPTY_RECORD);
+            expect(record2[0]).to.be.equal(EMPTY_RECORD);
+            expect(record2[1]).to.be.equal(EMPTY_RECORD);
+            expect(record2[2]).to.be.equal(EMPTY_RECORD);
+            expect(record2[3]).to.be.equal(EMPTY_RECORD);
         })
     })
 })

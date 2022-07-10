@@ -118,11 +118,20 @@ contract Battle {
 
   /// @dev Enables Player to Commit an Item
   /// @param commitment Takes a hashed commit and stores on chain
-  function commitItem(bytes32 commitment) external {
+  function commitItem(bytes32 commitment, uint256 tokenId) external {
     require(_canCommit(), COMMIT_ALREADY_EXISTS);
+    IGameItems _contract = _buildGameItems();
+    require(_contract.balanceOf(msg.sender, tokenId) >= 1, "Not an Owner");
     committed[msg.sender] = commitment;
     timesCommitted[msg.sender] = timesCommitted[msg.sender]++;
     emit Commited(msg.sender, commitment, timesCommitted[msg.sender]);
+  }
+
+  /// @dev Gets Current Commitment of a Player
+  /// @param player address of player
+  /// @return bytes32 current commitment
+  function getCommitment(address player) external view returns (bytes32) {
+    return committed[player];
   }
 
   /// @dev Gets Address of The Game Item Contract
