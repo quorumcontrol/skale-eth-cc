@@ -19,12 +19,12 @@ describe("Game Items Initial Mint Test", () => {
 
         return { factory, contract, owner, ADMIN_ROLE, WIN_MANAGER_ROLE, MINTER_ROLE, rng1, rng2 }
     }
-    it("Should Initially Fail", async() => {
-        const { contract, rng1 } = await loadFixture(deployContractFixture);
-            await expect(
-                contract.initialMint(rng1.address)
-            ).to.revertedWith("Not Enough Items")
-    })
+    // it("Should Initially Fail", async() => {
+        // const { contract, rng1 } = await loadFixture(deployContractFixture);
+            // await expect(
+            //     contract.initialMint(rng1.address)
+            // ).to.revertedWith("Not Enough Items")
+    // })
     it("Should Add 6 Items", async() => {
         const { contract, rng1 } = await loadFixture(deployContractFixture);
         await expect(
