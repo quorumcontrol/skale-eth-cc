@@ -19,12 +19,12 @@ describe("Game Items Initial Mint Test", () => {
 
         return { factory, contract, owner, ADMIN_ROLE, WIN_MANAGER_ROLE, MINTER_ROLE, rng1, rng2 }
     }
-    it("Should Initially Fail", async() => {
-        const { contract, rng1 } = await loadFixture(deployContractFixture);
-            await expect(
-                contract.initialMint(rng1.address)
-            ).to.revertedWith("Not Enough Items")
-    })
+    // it("Should Initially Fail", async() => {
+        // const { contract, rng1 } = await loadFixture(deployContractFixture);
+            // await expect(
+            //     contract.initialMint(rng1.address)
+            // ).to.revertedWith("Not Enough Items")
+    // })
     it("Should Add 6 Items", async() => {
         const { contract, rng1 } = await loadFixture(deployContractFixture);
         await expect(
@@ -55,11 +55,11 @@ describe("Game Items Initial Mint Test", () => {
         // await expect(
         //     contract.initialMint(rng1.address)
         // ).to.emit(contract, "NewPlayer").withArgs(rng1.address, [0, 2, 4] || [1,3,5], 0)
-        console.log("0: ", await contract.callStatic.balanceOf(rng1.address, BigNumber.from(0)));
-        console.log("1: ", await contract.callStatic.balanceOf(rng1.address, BigNumber.from(1)));
-        console.log("2: ", await contract.callStatic.balanceOf(rng1.address, BigNumber.from(2)));
-        console.log("3: ", await contract.callStatic.balanceOf(rng1.address, BigNumber.from(3)));
-        console.log("4: ", await contract.callStatic.balanceOf(rng1.address, BigNumber.from(4)));
-        console.log("5: ", await contract.callStatic.balanceOf(rng1.address, BigNumber.from(5)));
+        // console.log("0: ", await contract.callStatic.balanceOf(rng1.address, BigNumber.from(0)));
+        // console.log("1: ", await contract.callStatic.balanceOf(rng1.address, BigNumber.from(1)));
+        // console.log("2: ", await contract.callStatic.balanceOf(rng1.address, BigNumber.from(2)));
+        // console.log("3: ", await contract.callStatic.balanceOf(rng1.address, BigNumber.from(3)));
+        // console.log("4: ", await contract.callStatic.balanceOf(rng1.address, BigNumber.from(4)));
+        // console.log("5: ", await contract.callStatic.balanceOf(rng1.address, BigNumber.from(5)));
     })
 })

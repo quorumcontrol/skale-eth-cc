@@ -19,13 +19,13 @@ GameItems.ol
     - [x] Initial Mint Function
     - [x] Toggle Lock Function
 - [ ] GameItems.sol
-    - [ ] ADMIN_ROLE - ?? - @Topper?
-    - [ ] WIN_MANAGER_ROLE - ?? - Give Ability to Mint a single NFT on a Win if it does not already exists
-    - [ ] MINTER_ROLE - Gives ability to mint initial NFTs
-    - [ ] RNG for Random Mint - On Initial Mint, use RNG to provide 3 Random NFTs, 2 from the core list, 1 from the custom list?
-    - [ ] Combination Function - Takes 2 NFTs and Combines them to make a new one, does not result in a loss of any NFTs
-    - [ ] Pull Status Function - Pulls status of user in the form of a dynamic array. Will show empty spaces and names for non-available NFTs
-    - [ ] Block Transfer Until X Date
+    - [x] ADMIN_ROLE - ?? - @Topper?
+    - [x] WIN_MANAGER_ROLE - ?? - Give Ability to Mint a single NFT on a Win if it does not already exists
+    - [x] MINTER_ROLE - Gives ability to mint initial NFTs
+    - [x] RNG for Random Mint - On Initial Mint, use RNG to provide 3 Random NFTs, 2 from the core list, 1 from the custom list?
+    - [x] Combination Function - Takes 2 NFTs and Combines them to make a new one, does not result in a loss of any NFTs
+    - [x] Pull Status Function - Pulls status of user in the form of a dynamic array. Will show empty spaces and names for non-available NFTs
+    - [] Block Transfer Until X Date
     - [ ] Set Graphics as private and unrevealed by user
         - [ ] Mapping of Token Id -> String 
         - [ ] Available via Internal Call Only to load Token URI
