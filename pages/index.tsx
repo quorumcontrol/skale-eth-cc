@@ -1,6 +1,10 @@
-import Head from "next/head";
-import Image from "next/image";
+import { Text } from "@chakra-ui/react";
+import Layout from "../src/layouts/Layout";
 
 export default function Home() {
-  return <div> hi </div>;
+  return (
+    <Layout>
+      <Text>Hi</Text>
+    </Layout>
+  )
 }

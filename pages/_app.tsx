@@ -9,9 +9,14 @@ import {
   RainbowKitProvider,
   darkTheme,
 } from "@rainbow-me/rainbowkit";
-import { ChakraProvider, theme } from "@chakra-ui/react";
 import { activeChain, chainEnvs } from "../src/utils/networkSelector";
 import { localhost, skaleTestnet } from "../src/utils/SkaleChains";
+
+import "@rainbow-me/rainbowkit/styles.css";
+import "@fontsource/dm-sans";
+import { ChakraProvider, theme } from "@chakra-ui/react";
+
+
 
 function getChain() {
   switch (activeChain) {

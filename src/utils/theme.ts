@@ -13,7 +13,7 @@ const theme = extendTheme({
     },
   },
   fonts: {
-    heading: "Zen Dots, sans-serif",
+    heading: "DM Sans, sans-serif",
     body: "DM Sans, sans-serif",
   },
   colors: {
