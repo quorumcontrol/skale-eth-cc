@@ -67,7 +67,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         >
           <ChakraProvider theme={theme}>
             <Head>
-              <title>Crypto Colosseum: Delph's Table</title>
+              <title>Block, Paper, Scissors</title>
               <meta
                 name="viewport"
                 content="width=device-width, initial-scale=1"
@@ -75,7 +75,7 @@ function MyApp({ Component, pageProps }: AppProps) {
               <meta charSet="utf-8" />
               <meta
                 property="og:site_name"
-                content="Crypto Colosseum: Delph's Table"
+                content="Block, Paper, Scissors"
                 key="ogsitename"
               />
               <link rel="icon" href="/favicon.ico" />
@@ -86,31 +86,26 @@ function MyApp({ Component, pageProps }: AppProps) {
               <link rel="icon" href="/favicon.ico" />
               <meta
                 property="og:title"
-                content="Crypto Colosseum: Delph's Table"
+                content="Block, Paper, Scissors"
                 key="ogtitle"
               />
               <meta
                 property="og:description"
-                content="Generate badges for the warriors attending your events."
+                content="Battle your new conference buddies, get all the items. Don't get rekt."
                 key="ogdesc"
               />
 
               <meta name="twitter:card" content="summary" key="twcard" />
-              <meta
-                name="twitter:creator"
-                content="@larva_maiorum"
-                key="twhandle"
-              />
 
               <meta
                 property="og:url"
-                content="https://delphs.larvamaiorum.com"
+                content="https://TBD"
                 key="ogurl"
               />
             </Head>
             <Script
               strategy="afterInteractive"
-              src="https://www.googletagmanager.com/gtag/js?id=G-VF4GZ76QZK"
+              src="https://www.googletagmanager.com/gtag/js?id=G-DQFF62EC7C"
             />
             <Script
               id="gtag-init"
@@ -120,9 +115,7 @@ function MyApp({ Component, pageProps }: AppProps) {
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
                 gtag('js', new Date());
-                gtag('config', 'G-VF4GZ76QZK', {
-                  page_path: window.location.pathname,
-                });
+                gtag('config', 'G-DQFF62EC7C');
               `,
               }}
             />
