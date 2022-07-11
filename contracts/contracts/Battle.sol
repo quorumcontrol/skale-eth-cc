@@ -49,7 +49,11 @@ contract Battle {
 
   /// @notice Emits the End of a Battle
   event BattleCompleted(address indexed playerOne, address indexed playerTwo, uint8 result, uint256 playerOneItem, uint256 playerTwoItem);
+  /// @notice Emits a Cheater
+  event Cheater(address indexed cheater);
+  /// @notice Emits a New Commited Item
   event Commited(address indexed committer, bytes32 indexed commitment, uint256 commitmentNumber);
+
   /// @dev Sets Game Item Contract to the active Game Items
   /// @dev Script MUST add WIN_MANAGER_ROLE to THIS
   /// @param _gameItemAddress Address of Game Item
@@ -61,67 +65,50 @@ contract Battle {
   /////////////// External ///////////////
   ////////////////////////////////////////
 
-  /// @dev The Battle Function
+    /// @dev The Battle Function
   /// @dev Checks Both the Signer and the Opponent for Items
   /// @dev Takes the bytes32 hash and uses it with token ids to match items for a full return on both ends
   /// @dev Emits an Event With all the data as well?
-  function battle(address opponent, bytes32 mySalt, bytes32 opponentSalt) external {
-    address _p1 = msg.sender;
-    address _p2 = opponent;
+  function battle(address p2, bytes32 p2Salt, uint256 p2TokenId, bytes32 p1Salt, uint256 p1TokenId) external {
+    address p1 = msg.sender;
 
     /// 1 - Confirm My Salt and Opponent Salt Are NOT Commitable i.e can battle
-    require(!_canBattle(_p1), CANNOT_BATTLE);
-    require(!_canBattle(_p2), CANNOT_BATTLE);
-
-    /// 2 - Loops through the # of Items on GameItems Contract, Attempts to Match Salt with TokenId for each player
+    require(_canBattle(p1), CANNOT_BATTLE);
+    require(_canBattle(p2), CANNOT_BATTLE);
 
     IGameItems _gameItemsContract = _buildGameItems();
 
-    /// Loads Number of Items to Loop Through
-    uint256 _numberItems = _gameItemsContract.getNumberItems();
-    uint256 _p1TokenId = 1000; /// Initial Setting of MyTokenId
-    uint256 _p2TokenId = 1000; /// Initial Setting of Opponent Token Id
+    bytes32 p1Commitment = keccak256(abi.encodePacked(p1Salt, "+", p1TokenId));
+    bytes32 p2Commitment = keccak256(abi.encodePacked(p2Salt, "+", p2TokenId));
 
-    /// Loops Through # of Items
-    for (uint i = 0; i < _numberItems; i++) {
-      /// If True === Not Found yet, Continue Loop
-      if (_p1TokenId == 1000) {
-        /// Geneate Hash of Salt + "+" + tokenId
-        bytes32 _hash = keccak256(abi.encodePacked(mySalt,"+", i));
-        /// If Match -> Set Token id
-        if (_hash == committed[msg.sender]) _p1TokenId = i;
-      }
+    require(committed[p1] == p1Commitment, "P1 Commitment Mismatched");
+    require(committed[p2] == p2Commitment, "P2 Commitment Mismatched");
 
-      if (_p2TokenId == 1000) {
-        bytes32 _hash = keccak256(abi.encodePacked(opponentSalt,"+", i));
-        if (_hash == committed[opponent]) _p2TokenId = i;
-      }
-
-      /// If Both Players are found, break
-      if (_p1TokenId != 1000 && _p2TokenId != 1000) break;
-
+    if (_gameItemsContract.balanceOf(p1, p1TokenId) == 0) {
+      _removeCommitment(p1);
+      _removeCommitment(p2);
+      emit Cheater(p1);
+    } else if (_gameItemsContract.balanceOf(p2, p2TokenId) >= 1) {
+      _removeCommitment(p1);
+      _removeCommitment(p2);
+      emit Cheater(p2);
+    } else {
+      /// 3 - Runs Reveal and Battle Logic
+      uint8 result = _findWinner(_gameItemsContract, p1TokenId, p2TokenId);
+      /// 4 - Set Win/Set Lost
+      _setResult(p1, p2, result);
+      /// 5 - Remove Commitments for Each Player
+      _removeCommitment(p1);
+      _removeCommitment(p2);
+      /// 6 - Emit Battle Event
+      emit BattleCompleted(p1, p2, result, p1TokenId, p2TokenId);
     }
-
-    require(_p1TokenId != 1000, "Player One Commitment Error");
-    require(_p2TokenId != 1000, "Player Two Commitment Error");
-
-    /// 3 - Runs Reveal and Battle Logic
-    uint8 result = _findWinner(_gameItemsContract, _p1TokenId, _p2TokenId);
-    /// 4 - Set Win/Set Lost
-    _setResult(_p1, _p2, result);
-    /// 5 - Remove Commitments for Each Player
-    _removeCommitment(msg.sender);
-    _removeCommitment(opponent);
-    /// 6 - Emit Battle Event
-    emit BattleCompleted(msg.sender, opponent, result, _p1TokenId, _p2TokenId); /// TO DO FIX
   }
 
   /// @dev Enables Player to Commit an Item
   /// @param commitment Takes a hashed commit and stores on chain
-  function commitItem(bytes32 commitment, uint256 tokenId) external {
+  function commitItem(bytes32 commitment) external {
     require(_canCommit(), COMMIT_ALREADY_EXISTS);
-    IGameItems _contract = _buildGameItems();
-    require(_contract.balanceOf(msg.sender, tokenId) >= 1, "Not an Owner");
     committed[msg.sender] = commitment;
     timesCommitted[msg.sender] = timesCommitted[msg.sender]++;
     emit Commited(msg.sender, commitment, timesCommitted[msg.sender]);
@@ -169,7 +156,7 @@ contract Battle {
   /// @dev Used for New Player Commit 
   /// @return bool if can commit
   function _canCommit() internal view returns (bool) {
-    return committed[msg.sender] == "";
+    return committed[msg.sender][0] == 0; ///committed[msg.sender] == "";
   }
 
   /// @dev Finds Winner :) 
