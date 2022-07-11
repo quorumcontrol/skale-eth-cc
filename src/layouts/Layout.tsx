@@ -41,9 +41,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       </VStack>
       <Box as="footer" mt="200" textAlign="center">
         <Text fontSize="sm">
-          <Link href="https://larvamaiorum.com/">
-            A Crypto Colosseum: Larva Maiorum experience.
-          </Link>
+            Created by ...
         </Text>
       </Box>
     </Container>
