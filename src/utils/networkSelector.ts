@@ -1,3 +1,4 @@
+import localAddresses from '../../contracts/deployments/localhost/addresses.json'
 
 export enum chainEnvs {
   local = 'local',
@@ -6,3 +7,12 @@ export enum chainEnvs {
 }
 
 export const activeChain = process.env.NEXT_PUBLIC_CHAIN || chainEnvs.local
+
+export function addresses() {
+  switch (activeChain) {
+    case chainEnvs.local:
+      return localAddresses
+    default:
+      throw new Error("UI doesn't yet support that chain")
+  }
+}

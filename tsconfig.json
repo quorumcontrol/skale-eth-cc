@@ -16,6 +16,6 @@
     "incremental": true,
     "preserveSymlinks": false,
   },
-  "include": ["next-env.d.ts", "pages", "src", "contracts/typechain"],
+  "include": ["next-env.d.ts", "pages", "src", "contracts/typechain-types", "contracts/deployments/**/addresses.json"],
   "exclude": ["node_modules"]
 }
