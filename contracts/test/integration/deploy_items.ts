@@ -1,9 +1,8 @@
-import { ethers } from 'hardhat';
 import DefaultFixture from './core_fixture';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { BigNumber, ContractTransaction } from 'ethers';
 
-export default async () => {
+const fixtures = async () => {
 
     const defaultFixture = await loadFixture(DefaultFixture);
     
@@ -22,6 +21,6 @@ export default async () => {
 
 
     return { ...defaultFixture };
-
-    
 }
+
+export default fixtures

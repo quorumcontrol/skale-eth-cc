@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ethers } from 'hardhat';
 import { BigNumber } from 'ethers';
+import deployRandom from '../helpers/deployRandomGenerator';
 
 describe("Battle Deployment Test", () => {
     
@@ -10,8 +11,10 @@ describe("Battle Deployment Test", () => {
 
         const [ owner, rng1, rng2 ] = await ethers.getSigners();
         
+        const rnd = await deployRandom()
+
         const factory = await ethers.getContractFactory("GameItems");
-        const contract = await factory.deploy();
+        const contract = await factory.deploy(rnd.address);
         await contract.deployed();
 
         const ADMIN_ROLE: string = await contract.callStatic.ADMIN_ROLE();

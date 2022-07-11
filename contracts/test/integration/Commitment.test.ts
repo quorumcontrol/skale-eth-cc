@@ -23,8 +23,8 @@ describe("Commit Item Deployment Test", () => {
         
         const p1Hash: string = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(randomBytes(32) + "+" + BigNumber.from(0)));
         const p2Hash: string = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(randomBytes(32) + "+" + BigNumber.from(2)));
-        await expect(contract2.connect(rng1).commitItem(p1Hash, BigNumber.from(0))).to.emit(contract2, "Committed");
-        await expect(contract2.connect(rng2).commitItem(p2Hash, BigNumber.from(0))).to.emit(contract2, "Committed");
+        await expect(contract2.connect(rng1).commitItem(p1Hash)).to.emit(contract2, "Committed");
+        await expect(contract2.connect(rng2).commitItem(p2Hash)).to.emit(contract2, "Committed");
 
         expect(await contract2.callStatic.getCommitment(rng1.address)).to.be.equal(p1Hash);
         expect(await contract2.callStatic.getCommitment(rng2.address)).to.be.equal(p2Hash);
