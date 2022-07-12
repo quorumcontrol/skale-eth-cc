@@ -177,7 +177,7 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
     /// @dev Only Callalble by MINTER_ROLE
     /// @dev Emits [NewPlayer] event and adds a new player
     /// @param receiver the individual receiving the intial mint
-    function initialMint(address receiver) override external onlyMinter {
+    function initialMint(address payable receiver) override external payable onlyMinter {
         require(_noBalances(receiver), INVALID_NEW_PLAYER);
         uint256 _rng = _getRandomNumber();
         uint256[3] memory tokenIds = _rng == 0 ? [uint256(0), 2, 4] : [uint256(1), 3, 5];
@@ -185,6 +185,7 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
             _internalMint(receiver, tokenIds[i]);
         }
         numberPlayers++;
+        receiver.transfer(msg.value);
         emit NewPlayer(receiver, tokenIds);
     }
 
