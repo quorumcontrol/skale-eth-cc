@@ -202,6 +202,14 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
         return super.supportsInterface(interfaceId);
     }
 
+    /// @notice WIN_MANAGER_CALL
+    /// @dev On Battle Win -> Win Manager Mints
+    /// @param receiever the user that wins
+    /// @param tokenId The tokenId to be minted
+    function winBattle(address receiever, uint256 tokenId) override external onlyWinManager {
+        _internalMint(receiever, tokenId);
+    }
+
     /// @notice Internal Mint
     /// @dev Mints the Selected Token Id to the Selected Reciever
     /// @dev Always mints only 1
