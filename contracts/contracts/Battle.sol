@@ -97,7 +97,7 @@ contract Battle {
       uint8 result = _findWinner(_gameItemsContract, p1TokenId, p2TokenId);
       /// 4 - Set Win/Set Lost
       _setResult(p1, p2, result);
-      _mintForWinner(result, p1TokenId, p2TokenId);
+      _mintForWinner(_gameItemsContract, result, p1TokenId, p1, p2TokenId, p2);
       /// 5 - Remove Commitments for Each Player
       _removeCommitment(p1);
       _removeCommitment(p2);
