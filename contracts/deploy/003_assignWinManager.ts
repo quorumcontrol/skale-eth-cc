@@ -24,7 +24,9 @@ const func: DeployFunction = async function ({
     );
 
     /// Additional Check Can Be Commented in for Verification
-    // const hasRole = await read("GameItems", {}, "hasRole", ["0x581d7f64a8a641e01714c2dbb65d39f75e5db27e77fac6575785e5201e1b1dec", battle.address]);
+    // console.log("Battle Address: ", battle.address);
+    // const hasRole = await read("GameItems", {}, "hasRole", "0x581d7f64a8a641e01714c2dbb65d39f75e5db27e77fac6575785e5201e1b1dec", battle.address);
+    // console.log("HAS ROLE: ", hasRole);
 }
 
 export default func;
