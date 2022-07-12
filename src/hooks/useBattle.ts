@@ -6,7 +6,7 @@ import { memoize } from "../utils/memoize"
 import { addresses } from "../utils/networkSelector"
 import { useQuery, useMutation, useQueryClient } from 'react-query'
 import { randomBytes } from "crypto"
-import { defaultAbiCoder, solidityKeccak256 } from "ethers/lib/utils"
+import { BytesLike, defaultAbiCoder, solidityKeccak256 } from "ethers/lib/utils"
 
 const LOCAL_STORAGE_SALT_KEY = 'bps:salt'
 const LOCAL_STORAGE_TOKEN_KEY = 'bps:tokenId'
@@ -25,6 +25,26 @@ export const useBattleContract = () => {
     }
     return battleContract(signer)
   }, [signer])
+}
+
+export interface BattleInfo {
+  opponentAddr:string
+  opponentSalt:BytesLike
+  opponentTokenid:BigNumber
+}
+
+export const useDoBattle = () => {
+  const { data:commitment } = useCommitment()
+  const battleContract = useBattleContract()
+
+  return useMutation(async (info:BattleInfo) => {
+    if (!commitment || !commitment.isCommitted || !battleContract) {
+      throw new Error('pre-reqs not ready')
+    }
+    const tx = await battleContract.battle(info.opponentAddr, info.opponentSalt, info.opponentTokenid, commitment.salt!, commitment.tokenId!)
+    console.log('battle tx: ', tx.hash)
+    return tx.wait()
+  })
 }
 
 export const useEncodedCommitmentData = () => {

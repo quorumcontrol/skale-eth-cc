@@ -1,5 +1,4 @@
 import { Spinner, Text } from "@chakra-ui/react";
-import NFTCard from "../src/components/NFTCard";
 import {
   useCommitment,
   useEncodedCommitmentData,
@@ -43,6 +42,7 @@ export default function Battle() {
     <Layout>
       <Text>Battle</Text>
       <PaddedQRCode value={qrData || ''} />
+      <Text>Prefer to scan your opponent? <AppLink href="/scanner">Click here.</AppLink></Text>
     </Layout>
   );
 }
