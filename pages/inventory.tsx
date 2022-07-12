@@ -1,8 +1,8 @@
 import { Spinner, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import NFTCard from "../src/components/NFTCard";
-import { useDoCommit } from "../src/hooks/useBattle";
+import { useCommitment, useDoCommit } from "../src/hooks/useBattle";
 import { useInventory } from "../src/hooks/useGameItems";
 import useIsClientSide from "../src/hooks/useIsClientSide";
 import Layout from "../src/layouts/Layout";
@@ -11,8 +11,15 @@ export default function Inventory() {
   const [loading, setLoading] = useState(false)
   const { data: tokens } = useInventory()
   const isClient = useIsClientSide()
+  const { data:commitment } = useCommitment()
   const commit = useDoCommit()
   const router = useRouter()
+
+  useEffect(() => {
+    if (commitment && commitment.isCommitted) {
+      router.push('/battle')
+    }
+  }, [commitment])
 
   const onChoose = async (tokenId:number) => {
     setLoading(true)
