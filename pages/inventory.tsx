@@ -44,7 +44,7 @@ export default function Inventory() {
     <Layout>
       <Text>Inventory</Text>
       {isClient && tokens && tokens.length == 0 && (
-        <Text>Looks like you have no items, you'll need to get an invite code.</Text>
+        <Text>Looks like you have no items, you&lsquo;ll need to get an invite code.</Text>
       )}
       {
         isClient && tokens && tokens.map((token) => {
