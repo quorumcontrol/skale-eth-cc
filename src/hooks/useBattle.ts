@@ -4,7 +4,7 @@ import { useAccount, useSigner } from "wagmi"
 import { Battle__factory } from "../../contracts/typechain-types"
 import { memoize } from "../utils/memoize"
 import { addresses } from "../utils/networkSelector"
-import { useQuery, useMutation } from 'react-query'
+import { useQuery, useMutation, useQueryClient } from 'react-query'
 import { randomBytes } from "crypto"
 import { defaultAbiCoder, solidityKeccak256 } from "ethers/lib/utils"
 
@@ -65,6 +65,7 @@ export const useCommitment = () => {
 export const useDoCommit = () => {
   const { address } = useAccount()
   const battleContract = useBattleContract()
+  const client = useQueryClient()
 
   return useMutation(async (tokenId:number) => {
     if (!battleContract) {
@@ -77,6 +78,12 @@ export const useDoCommit = () => {
     const commit = solidityKeccak256(['bytes32', 'uint256'], [salt, BigNumber.from(tokenId)])
 
     const tx = await battleContract.commitItem(commit)
-    return tx
+    return tx.wait()
+  }, {
+    onSuccess: () => {
+      client.invalidateQueries([['commitment', address]], {
+        refetchInactive: true,
+      })
+    }
   })
 }

@@ -3,7 +3,7 @@ import React from 'react'
 import ipfsToWeb from '../utils/ipfsToWeb';
 
 export function typeFromUrl(animationUrl: string) {
-  if (animationUrl === '') {
+  if (animationUrl === '' || !animationUrl) {
     return undefined
   }
   if (animationUrl.includes(".mp4")) {
