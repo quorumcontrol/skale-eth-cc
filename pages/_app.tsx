@@ -8,6 +8,8 @@ import {
   getDefaultWallets,
   RainbowKitProvider,
   darkTheme,
+  connectorsForWallets,
+  wallet,
 } from "@rainbow-me/rainbowkit";
 import { activeChain, chainEnvs } from "../src/utils/networkSelector";
 import { localhost, skaleTestnet } from "../src/utils/SkaleChains";
@@ -15,8 +17,15 @@ import { localhost, skaleTestnet } from "../src/utils/SkaleChains";
 import "@rainbow-me/rainbowkit/styles.css";
 import "@fontsource/dm-sans";
 import { ChakraProvider, theme } from "@chakra-ui/react";
+import { setupMobileBrowserWallet } from "../src/utils/mobileBrowserWallet";
 
+setupMobileBrowserWallet()
 
+const needsInjectedWalletFallback =
+  typeof window !== 'undefined' &&
+  window.ethereum &&
+  !window.ethereum.isMetaMask &&
+  !window.ethereum.isCoinbaseWallet;
 
 function getChain() {
   switch (activeChain) {
@@ -46,10 +55,19 @@ const { chains, provider } = configureChains(getChain(), [
   }),
 ]);
 
-const { connectors } = getDefaultWallets({
-  appName: "Delph's Table",
-  chains,
-});
+const connectors = connectorsForWallets([
+  {
+    groupName: 'Recommended',
+    wallets: [
+      wallet.metaMask({ chains }),
+      wallet.coinbase({ chains, appName: 'Blocks, Paper, Scissors' }),
+      wallet.walletConnect({ chains }),
+      ...(needsInjectedWalletFallback
+        ? [wallet.injected({ chains })]
+        : []),
+    ],
+  },
+]);
 
 const wagmiClient = createClient({
   autoConnect: true,

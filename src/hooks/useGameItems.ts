@@ -1,6 +1,7 @@
 import { BigNumber, providers } from "ethers"
 import { useMemo } from "react"
-import { useAccount, useProvider, useQuery } from "wagmi"
+import { useAccount, useProvider } from "wagmi"
+import { useQuery } from 'react-query'
 import { GameItems, GameItems__factory } from "../../contracts/typechain-types"
 import { memoize } from "../utils/memoize"
 import { addresses } from "../utils/networkSelector"

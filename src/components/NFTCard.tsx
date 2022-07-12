@@ -1,11 +1,11 @@
-import { Box, Image, Text } from "@chakra-ui/react";
+import { Box, Button, Image, Text } from "@chakra-ui/react";
 import React from "react";
 import { InventoryItem } from "../hooks/useGameItems";
 import ipfsToWeb from "../utils/ipfsToWeb";
 import Video, { typeFromUrl } from "./Video";
 
-const NFTCard: React.FC<{ item: InventoryItem }> = ({
-  item: { metadata: { name, description, image, animationUrl } },
+const NFTCard: React.FC<{ item: InventoryItem, onChoose?:(tokenId:number) => any }> = ({
+  onChoose, item: { tokenId, metadata: { name, description, image, animationUrl } },
 }) => {
   return (
     <Box
@@ -45,6 +45,9 @@ const NFTCard: React.FC<{ item: InventoryItem }> = ({
         <Text noOfLines={[2, 3, 5]} fontSize="sm">
           {description}
         </Text>
+        {onChoose && (
+          <Button onClick={() => onChoose(tokenId)}>Choose</Button>
+        )}
       </Box>
     </Box>
   );

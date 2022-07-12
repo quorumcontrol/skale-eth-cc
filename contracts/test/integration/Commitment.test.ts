@@ -5,6 +5,7 @@ import AddItemFixture from './deploy_items';
 import { BigNumber } from 'ethers';
 import { ethers } from 'hardhat';
 import { randomBytes } from 'crypto';
+import { solidityKeccak256 } from 'ethers/lib/utils';
 
 describe("Commit Item Deployment Test", () => {
     it("Confirm 11 Deployed Items", async() => {
@@ -21,8 +22,8 @@ describe("Commit Item Deployment Test", () => {
         await expect(contract.initialMint(rng1.address)).to.emit(contract, "NewPlayer");
         await expect(contract.initialMint(rng2.address)).to.emit(contract, "NewPlayer");
         
-        const p1Hash: string = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(randomBytes(32) + "+" + BigNumber.from(0)));
-        const p2Hash: string = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(randomBytes(32) + "+" + BigNumber.from(2)));
+        const p1Hash: string = solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(0)]);
+        const p2Hash: string =  solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(2)]);
         await expect(contract2.connect(rng1).commitItem(p1Hash)).to.emit(contract2, "Committed");
         await expect(contract2.connect(rng2).commitItem(p2Hash)).to.emit(contract2, "Committed");
 

@@ -78,8 +78,8 @@ contract Battle {
 
     IGameItems _gameItemsContract = _buildGameItems();
 
-    bytes32 p1Commitment = keccak256(abi.encodePacked(p1Salt, "+", p1TokenId));
-    bytes32 p2Commitment = keccak256(abi.encodePacked(p2Salt, "+", p2TokenId));
+    bytes32 p1Commitment = keccak256(abi.encodePacked(p1Salt, p1TokenId));
+    bytes32 p2Commitment = keccak256(abi.encodePacked(p2Salt, p2TokenId));
 
     require(committed[p1] == p1Commitment, "P1 Commitment Mismatched");
     require(committed[p2] == p2Commitment, "P2 Commitment Mismatched");

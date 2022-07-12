@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ethers } from 'hardhat';
-import { BigNumber, Contract } from 'ethers';
+import { BigNumber, constants, Contract } from 'ethers';
 import { randomBytes } from 'crypto';
 import deployRandom from '../helpers/deployRandomGenerator';
 
@@ -30,17 +30,17 @@ describe("Battle - User Testing", () => {
     it("Should Not Allow Player To Commit Tokens 0-11", async() => {
         const { contract2, rng1 } = await loadFixture(deployContractFixture);
         const _contract: Contract = contract2.connect(rng1);
-        await expect(_contract.commitItem(ethers.utils.keccak256(ethers.utils.toUtf8Bytes(randomBytes(32) + "+" + BigNumber.from(0))), BigNumber.from(0))).to.be.revertedWith("Not an Owner");
-        await expect(_contract.commitItem(ethers.utils.keccak256(ethers.utils.toUtf8Bytes(randomBytes(32) + "+" + BigNumber.from(1))), BigNumber.from(1))).to.be.revertedWith("Not an Owner");
-        await expect(_contract.commitItem(ethers.utils.keccak256(ethers.utils.toUtf8Bytes(randomBytes(32) + "+" + BigNumber.from(2))), BigNumber.from(2))).to.be.revertedWith("Not an Owner");
-        await expect(_contract.commitItem(ethers.utils.keccak256(ethers.utils.toUtf8Bytes(randomBytes(32) + "+" + BigNumber.from(3))), BigNumber.from(3))).to.be.revertedWith("Not an Owner");
-        await expect(_contract.commitItem(ethers.utils.keccak256(ethers.utils.toUtf8Bytes(randomBytes(32) + "+" + BigNumber.from(4))), BigNumber.from(4))).to.be.revertedWith("Not an Owner");
-        await expect(_contract.commitItem(ethers.utils.keccak256(ethers.utils.toUtf8Bytes(randomBytes(32) + "+" + BigNumber.from(5))), BigNumber.from(5))).to.be.revertedWith("Not an Owner");
-        await expect(_contract.commitItem(ethers.utils.keccak256(ethers.utils.toUtf8Bytes(randomBytes(32) + "+" + BigNumber.from(6))), BigNumber.from(6))).to.be.revertedWith("Not an Owner");
-        await expect(_contract.commitItem(ethers.utils.keccak256(ethers.utils.toUtf8Bytes(randomBytes(32) + "+" + BigNumber.from(7))), BigNumber.from(7))).to.be.revertedWith("Not an Owner");
-        await expect(_contract.commitItem(ethers.utils.keccak256(ethers.utils.toUtf8Bytes(randomBytes(32) + "+" + BigNumber.from(8))), BigNumber.from(8))).to.be.revertedWith("Not an Owner");
-        await expect(_contract.commitItem(ethers.utils.keccak256(ethers.utils.toUtf8Bytes(randomBytes(32) + "+" + BigNumber.from(9))), BigNumber.from(9))).to.be.revertedWith("Not an Owner");
-        await expect(_contract.commitItem(ethers.utils.keccak256(ethers.utils.toUtf8Bytes(randomBytes(32) + "+" + BigNumber.from(10))), BigNumber.from(10))).to.be.revertedWith("Not an Owner");
-        await expect(_contract.commitItem(ethers.utils.keccak256(ethers.utils.toUtf8Bytes(randomBytes(32) + "+" + BigNumber.from(11))), BigNumber.from(11))).to.be.revertedWith("Not an Owner");
+        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), constants.Zero]),  constants.Zero)).to.be.revertedWith("Not an Owner");
+        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(1)]), BigNumber.from(1))).to.be.revertedWith("Not an Owner");
+        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(2)]), BigNumber.from(2))).to.be.revertedWith("Not an Owner");
+        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(3)]), BigNumber.from(3))).to.be.revertedWith("Not an Owner");
+        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(4)]), BigNumber.from(4))).to.be.revertedWith("Not an Owner");
+        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(5)]), BigNumber.from(5))).to.be.revertedWith("Not an Owner");
+        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(6)]), BigNumber.from(6))).to.be.revertedWith("Not an Owner");
+        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(7)]), BigNumber.from(7))).to.be.revertedWith("Not an Owner");
+        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(8)]), BigNumber.from(8))).to.be.revertedWith("Not an Owner");
+        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(9)]), BigNumber.from(9))).to.be.revertedWith("Not an Owner");
+        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(10)]), BigNumber.from(10))).to.be.revertedWith("Not an Owner");
+        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(11)]), BigNumber.from(11))).to.be.revertedWith("Not an Owner");
     })
 })

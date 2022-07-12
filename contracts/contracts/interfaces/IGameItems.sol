@@ -20,6 +20,6 @@ interface IGameItems is IERC1155 {
     function getNumberItems() external returns (uint256);
     function getNumberPlayers() external returns (uint256);
     function getUnlockDate() external returns (uint256);
-    function initialMint(address receiver) external;
+    function initialMint(address payable receiver) payable external;
     function isLocked() external returns (bool);
 }
