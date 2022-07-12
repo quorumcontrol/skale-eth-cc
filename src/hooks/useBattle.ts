@@ -1,12 +1,14 @@
 import { BigNumber, constants, Signer } from "ethers"
-import { useMemo } from "react"
-import { useAccount, useSigner } from "wagmi"
+import { useEffect, useMemo } from "react"
+import { useAccount, useProvider, useSigner } from "wagmi"
 import { Battle__factory } from "../../contracts/typechain-types"
 import { memoize } from "../utils/memoize"
 import { addresses } from "../utils/networkSelector"
 import { useQuery, useMutation, useQueryClient } from 'react-query'
 import { randomBytes } from "crypto"
 import { BytesLike, defaultAbiCoder, solidityKeccak256 } from "ethers/lib/utils"
+import { TypedListener } from "../../contracts/typechain-types/common"
+import { BattleCompletedEvent } from "../../contracts/typechain-types/contracts/Battle"
 
 const LOCAL_STORAGE_SALT_KEY = 'bps:salt'
 const LOCAL_STORAGE_TOKEN_KEY = 'bps:tokenId'
@@ -33,6 +35,27 @@ export interface BattleInfo {
   opponentTokenid:BigNumber
 }
 
+export const useOnBattleComplete = (onBattleComplete:TypedListener<BattleCompletedEvent>) => {
+  const battle = useBattleContract()
+  const { address } = useAccount()
+
+  useEffect(() => {
+    if (!battle || !address) {
+      return
+    }
+    console.log('subscribing to battleCompleted')
+    const p1Filter = battle.filters.BattleCompleted(address, null, null, null, null)
+    const p2Filter = battle.filters.BattleCompleted(null, address, null, null, null)
+
+    battle.on(p1Filter, onBattleComplete)
+    battle.on(p2Filter, onBattleComplete)
+    return () => {
+      battle.off(p1Filter, onBattleComplete)
+      battle.off(p2Filter, onBattleComplete)
+    }
+  }, [battle, address])
+}
+
 export const useDoBattle = () => {
   const { data:commitment } = useCommitment()
   const battleContract = useBattleContract()
@@ -41,9 +64,13 @@ export const useDoBattle = () => {
     if (!commitment || !commitment.isCommitted || !battleContract) {
       throw new Error('pre-reqs not ready')
     }
+    console.log("doing battle: ", info)
+    const opponentCommitment = await battleContract.getCommitment(info.opponentAddr)
+    console.log("opponent commitment: ", opponentCommitment)
     const tx = await battleContract.battle(info.opponentAddr, info.opponentSalt, info.opponentTokenid, commitment.salt!, commitment.tokenId!)
     console.log('battle tx: ', tx.hash)
-    return tx.wait()
+    const receipt = await tx.wait()
+    return receipt
   })
 }
 
@@ -55,9 +82,11 @@ export const useEncodedCommitmentData = () => {
     if (!address || !commitment || !commitment.isCommitted) {
       return undefined
     }
-    return defaultAbiCoder.encode(
+    const encoded = defaultAbiCoder.encode(
       ['address', 'bytes32', 'uint256'],
-      [address, commitment.salt, commitment.tokenId])
+      [address, commitment.salt, BigNumber.from(commitment.tokenId)])
+    console.log('encoded', encoded, address, commitment.salt, commitment.tokenId)
+    return encoded
   }, [commitment, address])
 }
 
@@ -96,7 +125,7 @@ export const useDoCommit = () => {
     localStorage.setItem(LOCAL_STORAGE_SALT_KEY, salt.toString('hex'))
     localStorage.setItem(LOCAL_STORAGE_TOKEN_KEY, tokenId.toString(10))
     const commit = solidityKeccak256(['bytes32', 'uint256'], [salt, BigNumber.from(tokenId)])
-
+    console.log('committing: ', commit, salt, tokenId)
     const tx = await battleContract.commitItem(commit)
     return tx.wait()
   }, {

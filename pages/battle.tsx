@@ -2,16 +2,23 @@ import { Spinner, Text } from "@chakra-ui/react";
 import {
   useCommitment,
   useEncodedCommitmentData,
+  useOnBattleComplete,
 } from "../src/hooks/useBattle";
 import useIsClientSide from "../src/hooks/useIsClientSide";
 import Layout from "../src/layouts/Layout";
 import AppLink from "../src/components/AppLink";
 import PaddedQRCode from "../src/components/PaddedQRCode";
+import { useCallback } from "react";
 
 export default function Battle() {
   const { data: commitment, isFetching } = useCommitment();
   const qrData = useEncodedCommitmentData();
   const isClient = useIsClientSide();
+
+  const onBattleComplete = useCallback((...args:any[]) => {
+    console.log('battle complete: ', args)
+  }, [])
+  useOnBattleComplete(onBattleComplete)
 
   if (!isClient) {
     return (

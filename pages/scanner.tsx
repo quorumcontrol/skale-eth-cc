@@ -1,37 +1,46 @@
 import { Spinner, Text } from "@chakra-ui/react";
-import {
-  useCommitment, useDoBattle,
-} from "../src/hooks/useBattle";
+import { useCommitment, useDoBattle } from "../src/hooks/useBattle";
 import useIsClientSide from "../src/hooks/useIsClientSide";
 import Layout from "../src/layouts/Layout";
 import AppLink from "../src/components/AppLink";
-import { OnResultFunction, QrReader } from 'react-qr-reader';
-import { defaultAbiCoder } from "ethers/lib/utils";
+import { OnResultFunction, QrReader } from "react-qr-reader";
+import { defaultAbiCoder, solidityKeccak256 } from "ethers/lib/utils";
 import { useCallback, useState } from "react";
+import { useRouter } from "next/router";
 
 export default function Scanner() {
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const { data: commitment, isFetching } = useCommitment();
   const isClient = useIsClientSide();
-  const doBattle = useDoBattle()
+  const doBattle = useDoBattle();
+  const router = useRouter()
 
-  const onResult:OnResultFunction = useCallback(async (result) => {
+  const onResult: OnResultFunction = useCallback(async (result) => {
     if (!result || result.getNumBits() === 0) {
-      return null
+      return null;
     }
-    console.log('got a battle')
-    setLoading(true)
+    console.log("got a battle");
+    if (loading) {
+      return
+    }
+    setLoading(true);
     try {
-      const [address, salt, tokenId] = defaultAbiCoder.decode(['address', 'bytes32', 'uint256'], result.getRawBytes())
-      await doBattle.mutateAsync({
+      console.log('qr scan:', result.getText())
+      const [address, salt, tokenId] = defaultAbiCoder.decode(
+        ["address", "bytes32", "uint256"],
+        result.getText()
+      );
+      console.log('would be a commit of: ', solidityKeccak256(['bytes32', 'uint256'], [salt, tokenId]))
+      const receipt = await doBattle.mutateAsync({
         opponentAddr: address,
         opponentSalt: salt,
         opponentTokenid: tokenId,
-      })
+      });
+      await router.push(`/battleComplete/${receipt.transactionHash}`)
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [])
+  }, [doBattle, loading]);
 
   if (!isClient || loading) {
     return (
@@ -61,14 +70,15 @@ export default function Scanner() {
   return (
     <Layout>
       <Text>Scan your opponents QR code.</Text>
-      {isClient && <QrReader
-      containerStyle={{width: '100%', height: '100%'}}
-    ViewFinder={() => <Text>hi</Text>}
-    constraints={{
-      facingMode: 'user'
-    }}
-    onResult={onResult}
-  />}
-  </Layout>
+      {isClient && (
+        <QrReader
+          containerStyle={{ width: "100%", height: "100%" }}
+          constraints={{
+            facingMode: "user",
+          }}
+          onResult={onResult}
+        />
+      )}
+    </Layout>
   );
 }

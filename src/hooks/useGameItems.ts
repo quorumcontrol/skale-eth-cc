@@ -1,5 +1,5 @@
 import { BigNumber, providers } from "ethers"
-import { useMemo } from "react"
+import { useEffect, useMemo } from "react"
 import { useAccount, useProvider } from "wagmi"
 import { useQuery } from 'react-query'
 import { GameItems, GameItems__factory } from "../../contracts/typechain-types"
@@ -24,6 +24,22 @@ export interface InventoryItem {
   tokenId: number
   balance: BigNumber
   metadata: ThenArg<ReturnType<GameItems['getOnChainToken']>>
+}
+
+export const useOnSignedUp = (onSignedUp:()=>any) => {
+  const { address } = useAccount()
+  const gameItems = useGameItemsContract()
+
+  useEffect(() => {
+    if (!address) {
+      return
+    }
+    const filter = gameItems.filters.NewPlayer(address, null)
+    gameItems.on(filter, onSignedUp)
+    return () => {
+      gameItems.off(filter, onSignedUp)
+    }
+  }, [address, gameItems])
 }
 
 export const useInventory = () => {
