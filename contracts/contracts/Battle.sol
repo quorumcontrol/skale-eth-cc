@@ -97,6 +97,7 @@ contract Battle {
       uint8 result = _findWinner(_gameItemsContract, p1TokenId, p2TokenId);
       /// 4 - Set Win/Set Lost
       _setResult(p1, p2, result);
+      _mintForWinner(_gameItemsContract, result, p1TokenId, p1, p2TokenId, p2);
       /// 5 - Remove Commitments for Each Player
       _removeCommitment(p1);
       _removeCommitment(p2);
@@ -140,6 +141,8 @@ contract Battle {
   /////////////// Internal ///////////////
   ////////////////////////////////////////
 
+  /// @dev Builds Interface to Game Items Contract
+  /// @return IGameItems Returns active interface
   function _buildGameItems() internal view returns (IGameItems) {
     return IGameItems(gameItemAddress);
   }
@@ -185,6 +188,23 @@ contract Battle {
     return 2;
 
 
+  }
+
+  /// @dev Mints an NFT based on the winner
+  /// @dev Interface/Delegate Call out To IGameItems
+  /// @dev Contract Becomes Signer with WIN_MANAGER_ROLE
+  /// @param itemContract Game Items Contract
+  /// @param result of the battle, 0 = P1 Win, 1 = P2 Win, 2 = Skipped (Draw)
+  /// @param p1TokenId Player One Token Id
+  /// @param p1 Player One Address
+  /// @param p2 TokenId Player Two TokenId
+  /// @param p2 Player Two Address
+  function _mintForWinner(IGameItems itemContract, uint8 result, uint256 p1TokenId, address p1, uint256 p2TokenId, address p2) internal {
+    if (result == 0) {
+      itemContract.winBattle(p1, p2TokenId);
+    } else if (result == 1) {
+      itemContract.winBattle(p2, p1TokenId);
+    }
   }
 
   /// @dev Sets the Results for a Player After a Successfull Battle
