@@ -8,6 +8,8 @@ import {
   getDefaultWallets,
   RainbowKitProvider,
   darkTheme,
+  connectorsForWallets,
+  wallet,
 } from "@rainbow-me/rainbowkit";
 import { activeChain, chainEnvs } from "../src/utils/networkSelector";
 import { localhost, skaleTestnet } from "../src/utils/SkaleChains";
@@ -46,10 +48,16 @@ const { chains, provider } = configureChains(getChain(), [
   }),
 ]);
 
-const { connectors } = getDefaultWallets({
-  appName: "Block, Scissors, Paper",
-  chains,
-});
+const connectors = connectorsForWallets([
+  {
+    groupName: 'Recommended',
+    wallets: [
+      wallet.metaMask({ chains }),
+      wallet.coinbase({ chains, appName: 'Blocks, Paper, Scissors' }),
+      wallet.walletConnect({ chains }),
+    ],
+  },
+]);
 
 const wagmiClient = createClient({
   autoConnect: true,
