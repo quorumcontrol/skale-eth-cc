@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155URIStorage.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 import "./interfaces/IGameItems.sol";
+import "./interfaces/IDiceRoller.sol";
 
 /**
 *
@@ -24,6 +25,9 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     /// @notice Can Mint on Wini
     bytes32 public constant WIN_MANAGER_ROLE = keccak256("WIN_MANAGER_ROLE");
+
+    /// @notice the contract that provides random numbers
+    IDiceRoller immutable diceRoller;
 
     /// @notice Number of Items on the contract
     uint256 private numberItems;
@@ -66,10 +70,11 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
     /// @param timestamp The [timestamp] of combination occuring
     event Combined(address indexed creator, uint256 indexed tokenId, uint256 indexed timestamp);
 
-    constructor() ERC1155("GameItems") {
+    constructor(address diceRollerContract) ERC1155("GameItems") {
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, msg.sender);
         _setupRole(MINTER_ROLE, msg.sender);
+        diceRoller = IDiceRoller(diceRollerContract);
         numberItems = 0;
         numberPlayers = 0;
     }
@@ -172,7 +177,7 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
     /// @dev Only Callalble by MINTER_ROLE
     /// @dev Emits [NewPlayer] event and adds a new player
     /// @param receiver the individual receiving the intial mint
-    function initialMint(address receiver) override external onlyMinter {
+    function initialMint(address payable receiver) override external payable onlyMinter {
         require(_noBalances(receiver), INVALID_NEW_PLAYER);
         uint256 _rng = _getRandomNumber();
         uint256[3] memory tokenIds = _rng == 0 ? [uint256(0), 2, 4] : [uint256(1), 3, 5];
@@ -180,6 +185,7 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
             _internalMint(receiver, tokenIds[i]);
         }
         numberPlayers++;
+        receiver.transfer(msg.value);
         emit NewPlayer(receiver, tokenIds);
     }
 
@@ -218,20 +224,8 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
 
     /// @notice SKALE RNG Casting
     function _getRandomNumber() internal view returns (uint256) {
-        uint256 _rng = uint256(_randomNumberGenerator()) % 1000;
+        uint256 _rng = uint256(diceRoller.getRandom()) % 1000;
         return _rng < 500 ? 1 : 0;
-    }
-
-    /// @notice SKALE RNG (CHECK!)
-    function _randomNumberGenerator() internal view returns (bytes32 addr) {
-        assembly {
-            let freemem := mload(0x40)
-            let start_addr := add(freemem, 0)
-            if iszero(staticcall(gas(), 0x18, 0, 0, start_addr, 32)) {
-              invalid()
-            }
-            addr := mload(freemem)
-        }
     }
     
 }
