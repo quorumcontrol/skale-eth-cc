@@ -47,7 +47,7 @@ const { chains, provider } = configureChains(getChain(), [
 ]);
 
 const { connectors } = getDefaultWallets({
-  appName: "Delph's Table",
+  appName: "Block, Scissors, Paper",
   chains,
 });
 
