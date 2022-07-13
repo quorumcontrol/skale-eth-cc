@@ -1,5 +1,4 @@
 import { Button, Heading, Spinner, Text } from "@chakra-ui/react";
-import { useRouter } from "next/router";
 import { useAccount } from "wagmi";
 import NextLink from 'next/link'
 import { useInventory } from "../src/hooks/useGameItems";
@@ -9,7 +8,6 @@ import Layout from "../src/layouts/Layout";
 export default function Home() {
   const { address, isConnected } = useAccount()
   const { data:tokens, isFetching} = useInventory()
-  const router = useRouter()
   const isClient = useIsClientSide()
 
   if (!isClient || !isConnected) {

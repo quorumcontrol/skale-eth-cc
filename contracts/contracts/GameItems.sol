@@ -116,8 +116,8 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
     /// @param tokenURI description
 
     function addItem(string memory name, string memory description, string memory image, string memory animation, uint256[] memory beats, uint256[] memory combined, string memory tokenURI) override external onlyAdmin {
-        GameItemMetadata memory newItem = GameItemMetadata(name, description, image, animation, beats, combined);
         uint256 _currentItemIndex = numberItems;
+        GameItemMetadata memory newItem = GameItemMetadata(name, description, image, animation, beats, combined);
         metadata[_currentItemIndex] = newItem;
         _setURI(_currentItemIndex, tokenURI);
         numberItems++;
@@ -149,7 +149,7 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
     function getItems(address _address) override external view returns (GameItemMetadata[] memory) {
         GameItemMetadata[] memory _items = new GameItemMetadata[](numberItems);
         for (uint256 i = 0; i < _items.length; i++) {
-            if (balanceOf(_address, i) <= 1) {
+            if (balanceOf(_address, i) >= 1) {
                 _items[i] = metadata[i];
             }
         }
