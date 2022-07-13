@@ -48,6 +48,25 @@ export interface InventoryItem {
   metadata: Metadata
 }
 
+export const useAllItems = () => {
+  const gameItems = useGameItemsContract()
+  return useQuery(['all-items'], async () => {
+    const numItems = await gameItems.getNumberItems()
+    return Promise.all(Array(numItems.toNumber()).fill(true).map(async (_, i) => {
+      const item = await gameItems.getOnChainToken(i)
+      return {
+        id: i,
+        metadata: {
+          name: item.name,
+          image: item.image,
+          animationUrl: item.animationUrl,
+          description: item.description,
+        },
+      }
+    }))
+  })
+}
+
 export const useInventory = () => {
   const gameItems = useGameItemsContract()
   const { address } = useAccount()

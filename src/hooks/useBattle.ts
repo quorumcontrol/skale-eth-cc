@@ -10,6 +10,7 @@ import { BytesLike, defaultAbiCoder, solidityKeccak256 } from "ethers/lib/utils"
 import { TypedListener } from "../../contracts/typechain-types/common"
 import { BattleCompletedEvent } from "../../contracts/typechain-types/contracts/Battle"
 import useWebsocketProvider from "./useWebsocketProvider"
+import { useAllItems } from "./useGameItems"
 
 const LOCAL_STORAGE_SALT_KEY = 'bps:salt'
 const LOCAL_STORAGE_TOKEN_KEY = 'bps:tokenId'
@@ -28,6 +29,62 @@ export const useBattleContract = () => {
     }
     return battleContract(signer)
   }, [signer])
+}
+
+// event BattleCompleted(
+//   address indexed playerOne,
+//   address indexed playerTwo,
+//   uint8 result,
+//   uint256 playerOneItem,
+//   uint256 playerTwoItem
+// );
+
+export const useBattleTransaction = (txHash?:string) => {
+  const provider = useProvider()
+  const { address } = useAccount()
+  const { data:allItems } = useAllItems()
+
+  return useQuery(
+    ['use-battle-transaction', txHash],
+    async () => {
+      if (!address || !allItems) {
+        throw new Error('weirdly no address or allItems')
+      }
+      const receipt = await provider.getTransactionReceipt(txHash!)
+      const battleInterface = Battle__factory.createInterface()
+      const evt = receipt.logs.find((log) => {
+        return log.topics[0] === battleInterface.getEventTopic('BattleCompleted')
+      })
+      if (!evt) {
+        throw new Error('bad transaction hash: missing topic')
+      }
+      const parsedEvt = battleInterface.parseLog(evt)
+      console.log('parsed event: ', parsedEvt)
+
+      const isPlayerOne = parsedEvt.args.playerOne.toLowerCase() === address.toLowerCase()
+      const args = parsedEvt.args
+
+      const myItemId = isPlayerOne ? args.playerOneItem : args.playerTwoItem
+      const opponentItemId = isPlayerOne ? args.playerTwoItem : args.playerOneItem
+      const result = args.result
+      const playerIsWinner = (result === 0 && isPlayerOne) || (result === 1 && !isPlayerOne)
+      const myItem = allItems[myItemId.toNumber()]
+      const opponentItem =  allItems[opponentItemId.toNumber()]
+
+      return {
+        result,  // 0 = p1 wins, 1 = p2 wins, 2 = draw
+        playerIsWinner,
+        draw: result === 2,
+        myItem,
+        opponentItem,
+        winningItem: playerIsWinner ? myItem : opponentItem,
+        losingItem: playerIsWinner ? opponentItem : myItem,
+      }
+    },
+    {
+      enabled: !!txHash && !!address && !!allItems
+    }
+  )
 }
 
 export interface BattleInfo {
