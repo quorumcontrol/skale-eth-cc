@@ -1,6 +1,7 @@
-import { Spinner, Text } from "@chakra-ui/react";
+import { Button, Heading, Spinner, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useAccount } from "wagmi";
+import NextLink from 'next/link'
 import { useInventory } from "../src/hooks/useGameItems";
 import useIsClientSide from "../src/hooks/useIsClientSide";
 import Layout from "../src/layouts/Layout";
@@ -11,7 +12,7 @@ export default function Home() {
   const router = useRouter()
   const isClient = useIsClientSide()
 
-  if (!isConnected) {
+  if (!isClient || !isConnected) {
     return (
       <Layout>
         <Text>
@@ -29,10 +30,21 @@ export default function Home() {
     )
   }
 
-
-  if (isClient && address && tokens?.length === 0) {
-    return router.push('/signup')
-  }
-
-  router.push('/inventory')
+  return (
+    <Layout>
+      <Heading>Welcome to Block, Paper, Scissors</Heading>
+      <Text>Collect all the items for prizes!</Text>
+      <Text>Choose an item, find someone to play against, scan your codes. If you win, you get their item.</Text>
+      { isClient && address && tokens?.length === 0 && (
+        <NextLink href="/signup">
+          <Button>Signup</Button>
+        </NextLink>
+      )}
+      { isClient && address && (tokens?.length || 0) > 0 && (
+        <NextLink href="/inventory">
+          <Button>Play</Button>
+        </NextLink>
+      )}
+    </Layout>
+  )
 }
