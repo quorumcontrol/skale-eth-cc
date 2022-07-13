@@ -9,6 +9,7 @@ import { randomBytes } from "crypto"
 import { BytesLike, defaultAbiCoder, solidityKeccak256 } from "ethers/lib/utils"
 import { TypedListener } from "../../contracts/typechain-types/common"
 import { BattleCompletedEvent } from "../../contracts/typechain-types/contracts/Battle"
+import useWebsocketProvider from "./useWebsocketProvider"
 
 const LOCAL_STORAGE_SALT_KEY = 'bps:salt'
 const LOCAL_STORAGE_TOKEN_KEY = 'bps:tokenId'
@@ -37,21 +38,25 @@ export interface BattleInfo {
 
 export const useOnBattleComplete = (onBattleComplete:TypedListener<BattleCompletedEvent>) => {
   const battle = useBattleContract()
+  const websocketProvider = useWebsocketProvider()
   const { address } = useAccount()
 
   useEffect(() => {
     if (!battle || !address) {
       return
     }
-    console.log('subscribing to battleCompleted')
-    const p1Filter = battle.filters.BattleCompleted(address, null, null, null, null)
-    const p2Filter = battle.filters.BattleCompleted(null, address, null, null, null)
+    const wssBattle = battle.connect(websocketProvider)
 
-    battle.on(p1Filter, onBattleComplete)
-    battle.on(p2Filter, onBattleComplete)
+    console.log('subscribing to battleCompleted: ', address)
+    const p1Filter = wssBattle.filters.BattleCompleted(address, null, null, null, null)
+    const p2Filter = wssBattle.filters.BattleCompleted(null, address, null, null, null)
+
+    wssBattle.on(p1Filter, onBattleComplete)
+    wssBattle.on(p2Filter, onBattleComplete)
     return () => {
-      battle.off(p1Filter, onBattleComplete)
-      battle.off(p2Filter, onBattleComplete)
+      console.log('unsubscribing from battle completed')
+      wssBattle.off(p1Filter, onBattleComplete)
+      wssBattle.off(p2Filter, onBattleComplete)
     }
   }, [battle, address])
 }

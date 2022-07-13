@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./interfaces/IGameItems.sol";
+import "hardhat/console.sol";
 
 /**
  *
@@ -103,6 +104,7 @@ contract Battle {
             _removeCommitment(p1);
             _removeCommitment(p2);
             emit Cheater(p1);
+            console.log("player 1 is a cheater");
             return;
         }
 
@@ -110,13 +112,19 @@ contract Battle {
             _removeCommitment(p1);
             _removeCommitment(p2);
             emit Cheater(p2);
+            console.log("player 2 is a cheater");
+
             return;
         }
 
         /// 3 - Runs Reveal and Battle Logic
         uint8 result = _findWinner(_gameItemsContract, p1TokenId, p2TokenId);
+        console.log("result");
+        console.logUint(result);
+
         /// 4 - Set Win/Set Lost
         _setResult(p1, p2, result);
+        console.log("minting");
         _mintForWinner(
             _gameItemsContract,
             result,
@@ -129,6 +137,7 @@ contract Battle {
         _removeCommitment(p1);
         _removeCommitment(p2);
         /// 6 - Emit Battle Event
+        console.log("emitting");
         emit BattleCompleted(p1, p2, result, p1TokenId, p2TokenId);
     }
 
@@ -268,14 +277,14 @@ contract Battle {
         uint8 result
     ) internal {
         if (result == 0) {
-            wins[p1] = wins[p1]++;
-            losses[p2] = losses[p2]++;
+            wins[p1] = wins[p1] + 1;
+            losses[p2] = losses[p2] + 1;
         } else if (result == 1) {
-            wins[p2] = wins[p2]++;
-            losses[p1] = losses[p1]++;
+            wins[p2] = wins[p2] + 1;
+            losses[p1] = losses[p1] + 1;
         } else {
-            draws[p1] = draws[p1]++;
-            draws[p2] = draws[p2]++;
+            draws[p1] = draws[p1] + 1;
+            draws[p2] = draws[p2] + 1;
         }
     }
 

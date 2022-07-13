@@ -40,6 +40,7 @@ export interface Metadata {
   name:string
   image:string
   animationUrl:string
+  description: string
 }
 
 export interface InventoryItem {
@@ -63,7 +64,8 @@ export const useInventory = () => {
         metadata: {
           name: item.name,
           image: item.image,
-          animationUrl: item.animationUrl
+          animationUrl: item.animationUrl,
+          description: item.description,
         },
       }
     })
