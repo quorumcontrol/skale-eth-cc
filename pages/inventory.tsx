@@ -9,7 +9,7 @@ import Layout from "../src/layouts/Layout";
 
 export default function Inventory() {
   const [loading, setLoading] = useState(false)
-  const { data: tokens } = useInventory()
+  const { data: tokens, isFetching } = useInventory()
   const isClient = useIsClientSide()
   const { data:commitment } = useCommitment()
   const commit = useDoCommit()
@@ -32,7 +32,7 @@ export default function Inventory() {
     }
   }
   
-  if (loading) {
+  if (!isClient || loading || isFetching) {
     return (
       <Layout>
         <Spinner />
@@ -44,11 +44,11 @@ export default function Inventory() {
     <Layout>
       <Text>Inventory</Text>
       {isClient && tokens && tokens.length == 0 && (
-        <Text>Looks like you have no items, you'll need to get an invite code.</Text>
+        <Text>Looks like you have no items, you&lsquo;ll need to get an invite code.</Text>
       )}
       {
         isClient && tokens && tokens.map((token) => {
-          return <NFTCard item={token} key={`inventory-card-${token.tokenId}`} onChoose={onChoose} />
+          return <NFTCard item={token} key={`inventory-card-${token.id}`} onChoose={onChoose} />
         })
       }
     </Layout>

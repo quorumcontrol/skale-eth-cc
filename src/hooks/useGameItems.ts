@@ -1,5 +1,5 @@
 import { BigNumber, providers } from "ethers"
-import { useMemo } from "react"
+import { useEffect, useMemo } from "react"
 import { useAccount, useProvider } from "wagmi"
 import { useQuery } from 'react-query'
 import { GameItems, GameItems__factory } from "../../contracts/typechain-types"
@@ -20,10 +20,51 @@ export const useGameItemsContract = () => {
   }, [provider])
 }
 
+export const useOnSignedUp = (onSignedUp:()=>any) => {
+  const { address } = useAccount()
+  const gameItems = useGameItemsContract()
+
+  useEffect(() => {
+    if (!address) {
+      return
+    }
+    const filter = gameItems.filters.NewPlayer(address, null)
+    gameItems.on(filter, onSignedUp)
+    return () => {
+      gameItems.off(filter, onSignedUp)
+    }
+  }, [address, gameItems])
+}
+
+export interface Metadata {
+  name:string
+  image:string
+  animationUrl:string
+  description: string
+}
+
 export interface InventoryItem {
-  tokenId: number
-  balance: BigNumber
-  metadata: ThenArg<ReturnType<GameItems['getOnChainToken']>>
+  id: number,
+  metadata: Metadata
+}
+
+export const useAllItems = () => {
+  const gameItems = useGameItemsContract()
+  return useQuery(['all-items'], async () => {
+    const numItems = await gameItems.getNumberItems()
+    return Promise.all(Array(numItems.toNumber()).fill(true).map(async (_, i) => {
+      const item = await gameItems.getOnChainToken(i)
+      return {
+        id: i,
+        metadata: {
+          name: item.name,
+          image: item.image,
+          animationUrl: item.animationUrl,
+          description: item.description,
+        },
+      }
+    }))
+  })
 }
 
 export const useInventory = () => {
@@ -35,19 +76,19 @@ export const useInventory = () => {
     if (!address) {
       throw new Error('no address')
     }
-    const balances = await Promise.all(Array(12).fill(true).map(async (_, tokenId):Promise<InventoryItem|undefined> => {
-      const balance = await gameItems.balanceOf(address, tokenId)
-      if (balance.gt(0)) {
-        const metadata = await gameItems.getOnChainToken(tokenId)
-        return {
-          tokenId,
-          metadata,
-          balance
-        }
-      }
-    }))
 
-    return balances.filter((b) => !!b) as InventoryItem[]
+    const items:InventoryItem[] = (await gameItems.getItems(address)).map((item, i) => {
+      return {
+        id: i,
+        metadata: {
+          name: item.name,
+          image: item.image,
+          animationUrl: item.animationUrl,
+          description: item.description,
+        },
+      }
+    })
+    return items.filter((item) => item.metadata.name !== '')
   }, {
     enabled: !!address
   })

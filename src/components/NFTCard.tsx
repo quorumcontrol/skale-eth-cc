@@ -5,8 +5,7 @@ import ipfsToWeb from "../utils/ipfsToWeb";
 import Video, { typeFromUrl } from "./Video";
 
 const NFTCard: React.FC<{ item: InventoryItem, onChoose?:(tokenId:number) => any }> = ({
-  onChoose, item: { tokenId, metadata: { name, description, image, animationUrl } },
-}) => {
+  onChoose, item: { id, metadata: { name, description, image, animationUrl } } }) => {
   return (
     <Box
       borderRadius="lg"
@@ -46,7 +45,7 @@ const NFTCard: React.FC<{ item: InventoryItem, onChoose?:(tokenId:number) => any
           {description}
         </Text>
         {onChoose && (
-          <Button onClick={() => onChoose(tokenId)}>Choose</Button>
+          <Button onClick={() => onChoose(id)}>Choose</Button>
         )}
       </Box>
     </Box>

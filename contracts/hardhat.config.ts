@@ -16,10 +16,8 @@ const config: HardhatUserConfig = {
   networks: {
     skaletest: {
       url: "https://testnet-proxy.skalenodes.com/v1/whispering-turais",
-      // gasPrice: 0,
       accounts: [
-        process.env.SKALE_TEST_PRIVATE_KEY,
-        process.env.BADGE_MINTER_PRIVATE_KEY,
+        process.env.TESTNET_PRIVATE_KEY,
       ].filter((k) => !!k) as string[],
     },
   }

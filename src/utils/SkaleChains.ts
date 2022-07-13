@@ -35,6 +35,7 @@ export const localhost: Chain = {
   },
   rpcUrls: {
     default: 'http://127.0.0.1:8545/',
+    wss: 'ws://127.0.0.1:8545/',
   },
   blockExplorers: {
     default: { name: 'BlockScout', url: 'https://localhost:3000' },
