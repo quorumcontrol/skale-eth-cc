@@ -1,0 +1,54 @@
+{
+  "address": "0x90C9eCc0D4a842BB97347D745977B156e83d939c",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "getRandom",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "rnd",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0xc04cd27c02c7c96d4113c93f8f492a7a4b85f4466ffe249d71112d3ef6b93e93",
+  "receipt": {
+    "to": "0x0000000000000000000000000000000000000000",
+    "from": "0x905173B6C0A51925d3C9B619466c623c754Fb7BB",
+    "contractAddress": "0x90C9eCc0D4a842BB97347D745977B156e83d939c",
+    "transactionIndex": 0,
+    "gasUsed": "97893",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0x1df784af9f824eb0f5cb3b7d0175b6b6370694446705d37a3162adcfac5e0a6f",
+    "transactionHash": "0xc04cd27c02c7c96d4113c93f8f492a7a4b85f4466ffe249d71112d3ef6b93e93",
+    "logs": [],
+    "blockNumber": 1234444,
+    "cumulativeGasUsed": "97893",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [],
+  "numDeployments": 1,
+  "solcInputHash": "9a8a738c8b8733f78a2d4e9f1481d995",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.9+commit.e5eed63a\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"getRandom\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"rnd\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/DiceRoller.sol\":\"DiceRoller\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"contracts/DiceRoller.sol\":{\"content\":\"//SPDX-License-Identifier: Unlicense\\npragma solidity ^0.8.0;\\n\\nimport \\\"./interfaces/IDiceRoller.sol\\\";\\n\\ncontract DiceRoller is IDiceRoller {\\n    function getRandom() public override view returns (bytes32 rnd) {\\n        assembly {\\n            let freemem := mload(0x40)\\n            let start_addr := add(freemem, 0)\\n            if iszero(staticcall(gas(), 0x18, 0, 0, start_addr, 32)) {\\n                invalid()\\n            }\\n            rnd := mload(freemem)\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0xdad5cfc2da99a4b10c1d774bffaa757e757a02bfbfb0bf16cb1080c0cd87c2e3\",\"license\":\"Unlicense\"},\"contracts/interfaces/IDiceRoller.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.0;\\n\\ninterface IDiceRoller {\\n\\n  function getRandom() external view returns (bytes32 rnd);\\n\\n}\",\"keccak256\":\"0x2cebcd9df36dd054dcba79fcec31e97f19fe48ffcaf10afd4ae0832965d9f5de\",\"license\":\"MIT\"}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b5060ce8061001f6000396000f3fe6080604052348015600f57600080fd5b506004361060285760003560e01c8063aacc5a1714602d575b600080fd5b60336047565b604051603e9190607f565b60405180910390f35b60006040516000810160208160008060185afa605f57fe5b81519250505090565b6000819050919050565b6079816068565b82525050565b6000602082019050609260008301846072565b9291505056fea2646970667358221220e1c5d1fa72c3dcfbfc1a8cf2175ddc2e3b2aee996fc9aaa25e729a8e2e0b1a2164736f6c63430008090033",
+  "deployedBytecode": "0x6080604052348015600f57600080fd5b506004361060285760003560e01c8063aacc5a1714602d575b600080fd5b60336047565b604051603e9190607f565b60405180910390f35b60006040516000810160208160008060185afa605f57fe5b81519250505090565b6000819050919050565b6079816068565b82525050565b6000602082019050609260008301846072565b9291505056fea2646970667358221220e1c5d1fa72c3dcfbfc1a8cf2175ddc2e3b2aee996fc9aaa25e729a8e2e0b1a2164736f6c63430008090033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [],
+    "types": null
+  }
+}
