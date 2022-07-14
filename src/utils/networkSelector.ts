@@ -11,7 +11,12 @@ export const activeChain = process.env.NEXT_PUBLIC_CHAIN || chainEnvs.local
 export function addresses() {
   switch (activeChain) {
     case chainEnvs.local:
-      return require('../../contracts/deployments/localhost/addresses.json')
+      try {
+        return require('../../contracts/deployments/localhost/addresses.json')
+      } catch (err) {
+        console.error('no local addresses')
+        return {}
+      }
     case chainEnvs.test:
       return require('../../contracts/deployments/skaletest/addresses.json')
     default:
