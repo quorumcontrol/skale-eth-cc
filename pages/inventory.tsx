@@ -1,4 +1,4 @@
-import { Spinner, Text } from "@chakra-ui/react";
+import { Heading, Spinner, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import NFTCard from "../src/components/NFTCard";
@@ -42,7 +42,8 @@ export default function Inventory() {
 
   return (
     <Layout>
-      <Text>Inventory</Text>
+      <Heading>Inventory</Heading>
+      <Text>Choose the item to play against your opponent.</Text>
       {isClient && tokens && tokens.length == 0 && (
         <Text>Looks like you have no items, you&lsquo;ll need to get an invite code.</Text>
       )}

@@ -30,7 +30,7 @@ export default function Home() {
 
   return (
     <Layout>
-      <Heading>Welcome to Block, Paper, Scissors</Heading>
+      <Heading>Welcome to Skale, Paper, Scissors</Heading>
       <Text>Collect all the items for prizes!</Text>
       <Text>Choose an item, find someone to play against, scan your codes. If you win, you get their item.</Text>
       { isClient && address && tokens?.length === 0 && (

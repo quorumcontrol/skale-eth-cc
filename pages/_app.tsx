@@ -60,7 +60,7 @@ const connectors = connectorsForWallets([
     groupName: 'Recommended',
     wallets: [
       wallet.metaMask({ chains }),
-      wallet.coinbase({ chains, appName: 'Blocks, Paper, Scissors' }),
+      wallet.coinbase({ chains, appName: 'Skale, Paper, Scissors' }),
       wallet.walletConnect({ chains }),
       ...(needsInjectedWalletFallback
         ? [wallet.injected({ chains })]
@@ -90,7 +90,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         >
           <ChakraProvider theme={theme}>
             <Head>
-              <title>Block, Paper, Scissors</title>
+              <title>Skale, Paper, Scissors</title>
               <meta
                 name="viewport"
                 content="width=device-width, initial-scale=1"
@@ -98,7 +98,7 @@ function MyApp({ Component, pageProps }: AppProps) {
               <meta charSet="utf-8" />
               <meta
                 property="og:site_name"
-                content="Block, Paper, Scissors"
+                content="Skale, Paper, Scissors"
                 key="ogsitename"
               />
               <link rel="icon" href="/favicon.ico" />
@@ -109,7 +109,7 @@ function MyApp({ Component, pageProps }: AppProps) {
               <link rel="icon" href="/favicon.ico" />
               <meta
                 property="og:title"
-                content="Block, Paper, Scissors"
+                content="Skale, Paper, Scissors"
                 key="ogtitle"
               />
               <meta

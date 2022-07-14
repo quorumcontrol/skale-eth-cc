@@ -63,7 +63,7 @@ export default function Scanner() {
   if (!commitment || !commitment.isCommitted) {
     return (
       <Layout>
-        <Text>Looks like you haven't chosen an item yet.</Text>
+        <Text>Looks like you haven&apos;t chosen an item yet.</Text>
         <AppLink href="/inventory">Go back to inventory.</AppLink>
       </Layout>
     );

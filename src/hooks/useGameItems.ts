@@ -1,7 +1,7 @@
-import { BigNumber, providers } from "ethers"
+import { BigNumber, providers, utils } from "ethers"
 import { useEffect, useMemo } from "react"
 import { useAccount, useProvider } from "wagmi"
-import { useQuery } from 'react-query'
+import { useMutation, useQuery } from 'react-query'
 import { GameItems, GameItems__factory } from "../../contracts/typechain-types"
 import { memoize } from "../utils/memoize"
 import { addresses } from "../utils/networkSelector"
@@ -33,7 +33,7 @@ export const useOnSignedUp = (onSignedUp:()=>any) => {
     return () => {
       gameItems.off(filter, onSignedUp)
     }
-  }, [address, gameItems])
+  }, [address, gameItems, onSignedUp])
 }
 
 export interface Metadata {
@@ -46,6 +46,36 @@ export interface Metadata {
 export interface InventoryItem {
   id: number,
   metadata: Metadata
+}
+
+export const useDoOnboard = () => {
+  const gameItems = useGameItemsContract()
+
+  return useMutation(async (address:string) => {
+    const tx = await gameItems.initialMint(address, { value: utils.parseEther('0.5')})
+    console.log('onboard tx: ', tx.hash)
+    const receipt = await tx.wait()
+    console.log('receipt')
+    return receipt
+  })
+}
+
+export const useCanOnboard = () => {
+  const gameItems = useGameItemsContract()
+  const { address } = useAccount()
+
+  return useQuery(['can-onboard', address],
+  async () => {
+    const minterRole = await gameItems.MINTER_ROLE()
+    const hasRole = await gameItems.hasRole(minterRole, address!)
+
+    console.log("has role? ", hasRole)
+
+    return hasRole
+  },
+  {
+    enabled: !!address
+  })
 }
 
 export const useAllItems = () => {
