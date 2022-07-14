@@ -102,6 +102,7 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
         require(hasRole(WIN_MANAGER_ROLE, msg.sender) || hasRole(ADMIN_ROLE, msg.sender), ACCESS_DENIED);
         _;
     }
+
     /// @notice Admin Function that enables the admin owner to add new tokens to the contract storage
     /// @dev Creates Metadata -> Stores as New Index
     /// @dev Sets Token URI for Backward Compatability with Marketplaces
@@ -112,31 +113,15 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
     /// @param image description
     /// @param animation description
     /// @param beats description
-    /// @param combined description
+    /// @param playoffs description
     /// @param tokenURI description
-
-    function addItem(string memory name, string memory description, string memory image, string memory animation, uint256[] memory beats, uint256[] memory combined, string memory tokenURI) override external onlyAdmin {
-        GameItemMetadata memory newItem = GameItemMetadata(name, description, image, animation, beats, combined);
+    function addItem(uint8 tier, string memory name, string memory description, string memory image, string memory animation, uint256[] memory beats, uint256[] memory playoffs, string memory tokenURI) override external onlyAdmin {
         uint256 _currentItemIndex = numberItems;
+        GameItemMetadata memory newItem = GameItemMetadata(tier, name, description, image, animation, beats, playoffs);
         metadata[_currentItemIndex] = newItem;
         _setURI(_currentItemIndex, tokenURI);
         numberItems++;
         emit NewItem(_currentItemIndex);
-    }
-
-    /// @notice Function takes a tokenId and checks if the signer has the required building blocks
-    /// @dev Uses the Storage Metadata for the checks to be fair across the board
-    /// @dev Balance Must be Greater than Or Equal to One
-    /// @dev Emits [Combined] Event if Combined
-    /// @param newItemId tokenId the signer is attempting to create
-    function combine(uint256 newItemId) override external {
-        require(newItemId <= numberItems, ITEM_DOES_NOT_EXIST);
-        GameItemMetadata storage item = metadata[newItemId];
-        for (uint256 i = 0; i < item.combined.length; i++) {
-            require(balanceOf(msg.sender, item.combined[i]) >= 1, USER_NO_ITEM);
-        }
-        _internalMint(msg.sender, newItemId);
-        emit Combined(msg.sender, newItemId, block.timestamp);
     }
 
     /// @notice Returns on Chain Token - Single (Metadata)
@@ -149,7 +134,7 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
     function getItems(address _address) override external view returns (GameItemMetadata[] memory) {
         GameItemMetadata[] memory _items = new GameItemMetadata[](numberItems);
         for (uint256 i = 0; i < _items.length; i++) {
-            if (balanceOf(_address, i) <= 1) {
+            if (balanceOf(_address, i) >= 1) {
                 _items[i] = metadata[i];
             }
         }
