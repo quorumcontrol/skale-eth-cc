@@ -28,13 +28,13 @@ const func: DeployFunction = async function ({
           from: deployer,
         },
         "addItem",
-
+        item.tier,
         item.name,
         item.description,
         item.image,
         item.animation,
         item.beats,
-        item.combined,
+        item.playOffs,
         item.tokenURI
       );
     }
