@@ -30,7 +30,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <LinkOverlay flexDir="row" display="flex" alignItems="center">
               <Image src={logo} alt="Crypto Colosseum logo" width="100px" height="100px"/>
               <Heading size="sm" ml="5">
-                Block, Paper, Scissors
+                Skale, Paper, Scissors
               </Heading>
             </LinkOverlay>
           </NextLink>
