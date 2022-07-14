@@ -12,6 +12,7 @@ const items = [
   },
   {
     id: 1,
+    tier: 0,
     name: 'Paper',
     description: "I hold this paper in my hand, but it's not heavy, not like my skin. It's light, and I can see my reflection in it.",
     image: '',
@@ -22,6 +23,7 @@ const items = [
   },
   {
     id: 2,
+    tier: 0,
     name: 'Scissors',
     description: 'A pair of scissors is a tool with a sharpened blade at a 90 degree angle, on either end of a piece of metal that is usually straight, but can also be curved.',
     image: '',
@@ -32,6 +34,7 @@ const items = [
   },
   {
     id: 3,
+    tier: 0,
     name: 'Lizard',
     description: 'The small lizard crawls around quickly, stopping to take a big breath every few seconds.',
     image: '',
@@ -42,6 +45,7 @@ const items = [
   },
   {
     id: 4,
+    tier: 0,
     name: 'Spock',
     description: 'The hand gesture is the Vulcan peace salute, which consists of raising one hand with the palm open and facing outward, while the fingers of the other hand are squeezed together in a fist.',
     image: '',
@@ -52,6 +56,7 @@ const items = [
   },
   {
     id: 5,
+    tier: 1,
     name: 'Mirror',
     description: "Every time you look at the 'spooky' mirror, it looks just the same way.",
     image: '',
@@ -62,6 +67,7 @@ const items = [
   },
   {
     id: 6,
+    tier: 1,
     name: 'Torch',
     description: "The existential torch is a gentle light illuminating the way to a brighter future.",
     image: '',
@@ -72,6 +78,7 @@ const items = [
   },
   {
     id: 7,
+    tier: 1,
     name: 'Chili Pepper',
     description: "In order to attain this heat level, it may have to be dried and crushed into a powder, the most extreme pepper would be The Carolina Reaper.",
     image: '',
@@ -92,6 +99,7 @@ const items = [
   },
   {
     id: 9,
+    tier: 2,
     name: 'Heart',
     description: "Every time Mylilius lays on the console, he closes his eyes and falls asleep.",
     image: 'ipfs://bafybeiaug4zos5ium3qagglul6vdwka5sncmh4i4ez74opearfw3lmrcxe/heart.gif',
@@ -102,6 +110,7 @@ const items = [
   },
   {
     id: 10,
+    tier: 2,
     name: 'Mask',
     description: "Larva Maiorum is a mask worn by the people of southern Italy in the province of El Oro.",
     image: '',
@@ -112,6 +121,7 @@ const items = [
   },
   {
     id: 11,
+    tier: 2,
     name: 'Ruby',
     description: "A Ruby is a medium of exchange because it is used as money for goods and services.",
     image: '',
