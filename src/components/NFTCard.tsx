@@ -44,7 +44,7 @@ const NFTCard: React.FC<{ item: InventoryItem, onChoose?:(tokenId:number) => any
           {description}
         </Text>
         {onChoose && (
-          <Button mt="2" onClick={() => onChoose(id)}>Choose</Button>
+          <Button mt="3" onClick={() => onChoose(id)}>Choose</Button>
         )}
       </Box>
     </Box>

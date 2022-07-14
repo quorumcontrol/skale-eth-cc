@@ -9,8 +9,8 @@ import {
   Text,
   LinkBox,
   LinkOverlay,
+  Image
 } from "@chakra-ui/react";
-import Image from "next/image";
 import NextLink from "next/link";
 import logo from "../assets/gameLogo.png";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
@@ -28,15 +28,15 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <LinkBox>
           <NextLink href="/" passHref>
             <LinkOverlay flexDir="row" display="flex" alignItems="center">
-              <Image src={logo} alt="Crypto Colosseum logo" width="100px" height="100px"/>
+              <Image src={logo.src} alt="Crypto Colosseum logo" width={['50px', '50px', '100px', '100px']} height={['50px', '50px', '100px', '100px']} />
               <Heading size="sm" ml="5">
                 Skale, Paper, Scissors
               </Heading>
             </LinkOverlay>
           </NextLink>
         </LinkBox>
-        <Spacer />
-        { isClient && canOnboard && <AppLink href="/onboard">Onboard</AppLink> }
+        <Spacer display={['none', 'none', 'block', 'block']} />
+        { isClient && canOnboard && <AppLink pt="2" href="/onboard">Onboard</AppLink> }
         <Box ml="5">
           <ConnectButton showBalance={false} />
         </Box>
