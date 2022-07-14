@@ -1,4 +1,3 @@
-import localAddresses from '../../contracts/deployments/localhost/addresses.json'
 import { localhost, skaleTestnet } from './SkaleChains'
 
 export enum chainEnvs {
@@ -12,7 +11,14 @@ export const activeChain = process.env.NEXT_PUBLIC_CHAIN || chainEnvs.local
 export function addresses() {
   switch (activeChain) {
     case chainEnvs.local:
-      return localAddresses
+      try {
+        return require('../../contracts/deployments/localhost/addresses.json')
+      } catch (err) {
+        console.error('no local addresses')
+        return {}
+      }
+    case chainEnvs.test:
+      return require('../../contracts/deployments/skaletest/addresses.json')
     default:
       throw new Error("UI doesn't yet support that chain")
   }
