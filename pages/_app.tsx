@@ -5,7 +5,6 @@ import Script from "next/script";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
 import {
-  getDefaultWallets,
   RainbowKitProvider,
   darkTheme,
   connectorsForWallets,
@@ -16,7 +15,8 @@ import { localhost, skaleTestnet } from "../src/utils/SkaleChains";
 
 import "@rainbow-me/rainbowkit/styles.css";
 import "@fontsource/dm-sans";
-import { ChakraProvider, theme } from "@chakra-ui/react";
+import { ChakraProvider } from "@chakra-ui/react";
+import theme from '../src/utils/theme'
 import { setupMobileBrowserWallet } from "../src/utils/mobileBrowserWallet";
 
 setupMobileBrowserWallet()
