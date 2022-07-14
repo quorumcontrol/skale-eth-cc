@@ -23,3 +23,13 @@ task('top-up')
     console.log("tx: ", tx.hash)
     await tx.wait()
   })
+
+task('make-minter')
+  .addParam('address')
+  .setAction(async ({ address }, hre) => {
+    const gameItems = await getGameItemsContract(hre)
+    const minter = await gameItems.MINTER_ROLE()
+    const tx = await gameItems.grantRole(minter, address)
+    console.log('tx: ', tx.hash)
+    await tx.wait()
+  })
