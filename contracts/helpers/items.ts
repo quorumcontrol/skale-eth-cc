@@ -84,11 +84,12 @@ const items = [
     image: '',
     animation: 'ipfs://bafybeiaug4zos5ium3qagglul6vdwka5sncmh4i4ez74opearfw3lmrcxe/pepper.mp4',
     beats: [2,4,9],
-    combined: [],
+    playOffs: [1],
     tokenURI: '',
   },
   {
     id: 8,
+    tier: 1,
     name: 'Ice Sculpture',
     description: "This beautiful ice sculpture of a polar bear is the product of a talented ice sculptor. The sculpture makes for a dramatic scene.",
     image: '',
