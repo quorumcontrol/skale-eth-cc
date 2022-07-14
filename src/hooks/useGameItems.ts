@@ -67,7 +67,11 @@ export const useCanOnboard = () => {
   return useQuery(['can-onboard', address],
   async () => {
     const minterRole = await gameItems.MINTER_ROLE()
-    return gameItems.hasRole(minterRole, address!)
+    const hasRole = await gameItems.hasRole(minterRole, address!)
+
+    console.log("has role? ", hasRole)
+
+    return hasRole
   },
   {
     enabled: !!address

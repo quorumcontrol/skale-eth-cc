@@ -19,7 +19,7 @@ import { useCanOnboard } from "../hooks/useGameItems";
 import useIsClientSide from "../hooks/useIsClientSide";
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const canOnboard = useCanOnboard()
+  const { data:canOnboard } = useCanOnboard()
   const isClient = useIsClientSide()
 
   return (
