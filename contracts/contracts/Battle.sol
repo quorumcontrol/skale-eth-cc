@@ -33,6 +33,8 @@ contract Battle {
     mapping(address => uint256) private losses;
     /// @notice Draw List
     mapping(address => uint256) private draws;
+    /// @notice Playoff Tracker
+    mapping(address => uint256) private playoff;
 
     ////////////////////////////////////////
     //////////////// Errors ////////////////
@@ -119,9 +121,16 @@ contract Battle {
 
         /// 3 - Runs Reveal and Battle Logic
         uint8 result = _findWinner(_gameItemsContract, p1TokenId, p2TokenId);
-        console.log("result");
-        console.logUint(result);
-
+        // console.log("result");
+        // console.logUint(result);
+        /// Playoff
+        if (result == 3) {
+            if (_gameItemsContract.playoff()) {
+                result = 0;
+            } else {
+                result = 1;
+            }
+        }
         /// 4 - Set Win/Set Lost
         _setResult(p1, p2, result);
         console.log("minting");
@@ -215,7 +224,7 @@ contract Battle {
     /// @param itemsContract the Game Items Proxy Contract
     /// @param p1TokenId the Token Id Player 1 Commited
     /// @param p2TokenId the tokenId Player 2 Commited
-    /// @return bool 0 if P1 wins, 1 if P2 Wins, 2 if Draw
+    /// @return bool 0 if P1 wins, 1 if P2 Wins, 2 if Draw, 3 is Playoff
     function _findWinner(
         IGameItems itemsContract,
         uint256 p1TokenId,
@@ -240,7 +249,7 @@ contract Battle {
             }
         }
         /// Automatic Return Draw Else
-        return 2;
+        return 3;
     }
 
     /// @dev Mints an NFT based on the winner
@@ -265,6 +274,12 @@ contract Battle {
         } else if (result == 1) {
             itemContract.winBattle(p2, p1TokenId);
         }
+    }
+
+
+    function _setPlayoff(address p1, address p2) internal {
+        playoff[p1] = playoff[p1] + 1;
+        playoff[p2] = playoff[p2] + 1;
     }
 
     /// @dev Sets the Results for a Player After a Successfull Battle

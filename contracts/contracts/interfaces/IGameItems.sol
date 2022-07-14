@@ -22,5 +22,6 @@ interface IGameItems is IERC1155 {
     function getUnlockDate() external returns (uint256);
     function initialMint(address payable receiver) payable external;
     function isLocked() external returns (bool);
+    function playoff() external returns (bool);
     function winBattle(address receiever, uint256 tokenId) external;
 }

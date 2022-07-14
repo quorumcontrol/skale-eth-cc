@@ -61,7 +61,7 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
     /// @param newPlayer The [newPlayer]that was added by address
     /// @param initialTokens The [initialTokens] that were added EXACT === 3
     // @param timestamp The [timestamp] of the new player joining
-    event NewPlayer(address indexed newPlayer, uint256[3] indexed initialTokens);
+    event NewPlayer(address indexed newPlayer, uint256[] indexed initialTokens);
 
     /// @notice Emits a new item being added given to the player on successfull combination
     /// @dev Used in the [combine] function
@@ -69,6 +69,13 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
     /// @param tokenId The [tokenId] that was combined to make and minted for the [creator]
     /// @param timestamp The [timestamp] of combination occuring
     event Combined(address indexed creator, uint256 indexed tokenId, uint256 indexed timestamp);
+
+    /// @notice Emits a TierUnlocked allowing for the frontend to notify the player
+    /// @dev Used inside the [winBattle] function
+    /// @param player The [player] who is unlocked a new tier
+    /// @param tokenId The [tokenId] that was granted for this new tier
+    /// @param tier The [tier] that was unlocked
+    event TierUnlocked(address indexed player, uint256 indexed tokenId, uint8 indexed tier);
 
     constructor(address diceRollerContract) ERC1155("GameItems") {
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -125,12 +132,16 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
     }
 
     /// @notice Returns on Chain Token - Single (Metadata)
+    /// @param tokenId of the token to retreive
+    /// @return GameItemMetadata of the Item
     function getOnChainToken(uint256 tokenId)  external view  returns (GameItemMetadata memory) { 
         return metadata[tokenId];
     }
 
     /// @notice Loads all the Metadata by a player in order to allow them to load the data
     /// @dev Thoughts on making this a signed request during ETH CC?
+    /// @param _address of the user
+    /// @return GameItemMetadata[] the items of the player
     function getItems(address _address) override external view returns (GameItemMetadata[] memory) {
         GameItemMetadata[] memory _items = new GameItemMetadata[](numberItems);
         for (uint256 i = 0; i < _items.length; i++) {
@@ -164,10 +175,16 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
     /// @param receiver the individual receiving the intial mint
     function initialMint(address payable receiver) override external payable onlyMinter {
         require(_noBalances(receiver), INVALID_NEW_PLAYER);
-        uint256 _rng = _getRandomNumber();
-        uint256[3] memory tokenIds = _rng == 0 ? [uint256(0), 2, 4] : [uint256(1), 3, 5];
-        for (uint256 i = 0; i < 3; i++) {
-            _internalMint(receiver, tokenIds[i]);
+        
+        uint256[] memory tokenIds = new uint256[](3);
+        uint8 index = 0;
+        while (index <= 2) {
+            uint256 _rng = _getRandomNumber(0, 4);
+            if (balanceOf(receiver, _rng) == 0) {
+                tokenIds[index] = _rng;
+                _internalMint(receiver, _rng);
+                index++;
+            }
         }
         numberPlayers++;
         receiver.transfer(msg.value);
@@ -187,12 +204,42 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
         return super.supportsInterface(interfaceId);
     }
 
+    /// @notice Playoff Function for Battle.sol
+    /// @dev Uses RNG to Find # between 0-1000
+    /// @dev Returns true for P2, False for P2
+    /// @return bool 
+    function playoff() override external view onlyWinManager returns (bool) {
+        return _getRandomNumber(0, 1000) < 500;
+    }
+
     /// @notice WIN_MANAGER_CALL
     /// @dev On Battle Win -> Win Manager Mints
     /// @param receiever the user that wins
     /// @param tokenId The tokenId to be minted
     function winBattle(address receiever, uint256 tokenId) override external onlyWinManager {
+        /// Run Internal Mint for the Winner
         _internalMint(receiever, tokenId);
+        /// Check The Tier of the Winner Item
+        uint8 tier = metadata[tokenId].tier;
+        if ((tier == 1 || tier == 2) && _checkTier(receiever, tier)) {
+            uint256 nextTierTokenId = _randomTokenId(tier + 1);
+            _internalMint(receiever, nextTierTokenId);
+            emit TierUnlocked(receiever, nextTierTokenId, tier + 1);
+        }
+        /// Else Nothing Since there is not another tier
+        
+    }
+
+    function _checkTier(address receiver, uint256 tier) internal view returns (bool) {
+        uint256 start = tier == 1 ? 0 : 5;
+        uint256 stop = tier == 1 ? 5 : 9;
+        for (uint256 i = start; i < stop; i++) {
+            if (balanceOf(receiver, i) == 0) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /// @notice Internal Mint
@@ -215,10 +262,30 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
         return true;
     }
 
+    /// @notice Selects a Random Token Id of the Next Tier
+    /// @dev Utilizes RNG Plus Length of Previous Item List
+    /// @dev !!! Unsure if the else statement should be here, theoretically impossible !!!
+    /// @param tier uint8 of the next tier to select
+    /// @return uint256 of the tokenId Selected
+    function _randomTokenId(uint8 tier) internal view returns (uint256) {
+        /// Tier == 2 -> returns 5, 6, 7, 8
+        if (tier == 2) {
+            return _getRandomNumber(5, 3);
+        /// Tier == 3 -> returns 9, 10, 11
+        } else if (tier == 3) {
+            return _getRandomNumber(9, 2);
+        } else {
+            return 0;
+        }
+    }
+
     /// @notice SKALE RNG Casting
-    function _getRandomNumber() internal view returns (uint256) {
-        uint256 _rng = uint256(diceRoller.getRandom()) % 1000;
-        return _rng < 500 ? 1 : 0;
+    /// @param minNumber the Minimum Number
+    /// @param maxNumber the Max Number
+    /// @return uint256 the returned random number 
+    function _getRandomNumber(uint256 minNumber, uint256 maxNumber) internal view returns (uint256) {
+        uint256 _rng = minNumber + (uint256(diceRoller.getRandom()) % maxNumber);
+        return _rng;
     }
     
 }
