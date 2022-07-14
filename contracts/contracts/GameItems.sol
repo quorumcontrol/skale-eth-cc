@@ -61,14 +61,7 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
     /// @param newPlayer The [newPlayer]that was added by address
     /// @param initialTokens The [initialTokens] that were added EXACT === 3
     // @param timestamp The [timestamp] of the new player joining
-    event NewPlayer(address indexed newPlayer, uint256[] indexed initialTokens);
-
-    /// @notice Emits a new item being added given to the player on successfull combination
-    /// @dev Used in the [combine] function
-    /// @param creator The [creator] that combined the NFTs
-    /// @param tokenId The [tokenId] that was combined to make and minted for the [creator]
-    /// @param timestamp The [timestamp] of combination occuring
-    event Combined(address indexed creator, uint256 indexed tokenId, uint256 indexed timestamp);
+    event NewPlayer(address indexed newPlayer, uint256[3] indexed initialTokens);
 
     /// @notice Emits a TierUnlocked allowing for the frontend to notify the player
     /// @dev Used inside the [winBattle] function
@@ -174,17 +167,51 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
     /// @param receiver the individual receiving the intial mint
     function initialMint(address payable receiver) override external payable onlyMinter {
         require(_noBalances(receiver), INVALID_NEW_PLAYER);
-        
-        uint256[] memory tokenIds = new uint256[](3);
-        uint8 index = 0;
-        while (index <= 2) {
-            uint256 _rng = _getRandomNumber(0, 4);
-            if (balanceOf(receiver, _rng) == 0) {
-                tokenIds[index] = _rng;
-                _internalMint(receiver, _rng);
-                index++;
+
+        // uint256[][] memory options = [
+        //     [uint256(0),1,2],
+        //     [uint256(1),2,3],
+        //     [uint256(2),3,4],
+        //     [uint256(0),2,4],
+        //     [uint256(1),3,4],
+        // ];
+        uint256[3] memory opt1 = [uint256(0),1,2];
+        uint256[3] memory opt2 = [uint256(1),2,3];
+        uint256[3] memory opt3 = [uint256(2),3,4];
+        uint256[3] memory opt4 = [uint256(0),2,4];
+        uint256[3] memory opt5 = [uint256(1),3,4];
+        uint256 _rng = _getRandomNumber(0, 4);
+
+        uint256[3] memory tokenIds = [uint256(0), 0, 0];
+
+        if (_rng == 0) {
+            for (uint256 i = 0; i < 3; i++) {
+                _internalMint(receiver, opt1[i]);
+                tokenIds = opt1;
+            }
+        } else if (_rng == 1) {
+            for (uint256 i = 0; i < 3; i++) {
+                _internalMint(receiver, opt2[i]);
+                tokenIds = opt2;
+            }
+        } else if (_rng == 2) {
+            for (uint256 i = 0; i < 3; i++) {
+                _internalMint(receiver, opt3[i]);
+                tokenIds = opt3;
+            }
+        } else if (_rng == 3) {
+            for (uint256 i = 0; i < 3; i++) {
+                _internalMint(receiver, opt4[i]);
+                tokenIds = opt4;
+            }
+        } else if (_rng == 4) {
+            for (uint256 i = 0; i < 3; i++) {
+                _internalMint(receiver, opt5[i]);
+                tokenIds = opt5;
+                
             }
         }
+
         numberPlayers++;
         receiver.transfer(msg.value);
         emit NewPlayer(receiver, tokenIds);

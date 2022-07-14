@@ -60,7 +60,7 @@ contract Battle {
     /// @notice Emits a Cheater
     event Cheater(address indexed cheater);
     /// @notice Emits a New Commited Item
-    event Commited(
+    event Committed(
         address indexed committer,
         bytes32 indexed commitment,
         uint256 commitmentNumber
@@ -156,7 +156,7 @@ contract Battle {
         require(_canCommit(), COMMIT_ALREADY_EXISTS);
         committed[msg.sender] = commitment;
         timesCommitted[msg.sender] = timesCommitted[msg.sender]++;
-        emit Commited(msg.sender, commitment, timesCommitted[msg.sender]);
+        emit Committed(msg.sender, commitment, timesCommitted[msg.sender]);
     }
 
     /// @dev Gets Current Commitment of a Player

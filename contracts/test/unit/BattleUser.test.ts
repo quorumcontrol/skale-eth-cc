@@ -27,20 +27,20 @@ describe("Battle - User Testing", () => {
 
         return { factory, contract, contract2, owner, ADMIN_ROLE, WIN_MANAGER_ROLE, MINTER_ROLE, rng1, rng2 };
     }
-    it("Should Not Allow Player To Commit Tokens 0-11", async() => {
+    it("Should Allow Player To One Token and Revert on All Else", async() => {
         const { contract2, rng1 } = await loadFixture(deployContractFixture);
         const _contract: Contract = contract2.connect(rng1);
-        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), constants.Zero]),  constants.Zero)).to.be.revertedWith("Not an Owner");
-        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(1)]), BigNumber.from(1))).to.be.revertedWith("Not an Owner");
-        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(2)]), BigNumber.from(2))).to.be.revertedWith("Not an Owner");
-        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(3)]), BigNumber.from(3))).to.be.revertedWith("Not an Owner");
-        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(4)]), BigNumber.from(4))).to.be.revertedWith("Not an Owner");
-        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(5)]), BigNumber.from(5))).to.be.revertedWith("Not an Owner");
-        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(6)]), BigNumber.from(6))).to.be.revertedWith("Not an Owner");
-        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(7)]), BigNumber.from(7))).to.be.revertedWith("Not an Owner");
-        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(8)]), BigNumber.from(8))).to.be.revertedWith("Not an Owner");
-        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(9)]), BigNumber.from(9))).to.be.revertedWith("Not an Owner");
-        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(10)]), BigNumber.from(10))).to.be.revertedWith("Not an Owner");
-        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(11)]), BigNumber.from(11))).to.be.revertedWith("Not an Owner");
+        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), constants.Zero]))).to.emit(_contract, "Committed");
+        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(1)]))).to.be.revertedWith("Commit Already Exists");
+        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(2)]))).to.be.revertedWith("Commit Already Exists");
+        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(3)]))).to.be.revertedWith("Commit Already Exists");
+        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(4)]))).to.be.revertedWith("Commit Already Exists");
+        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(5)]))).to.be.revertedWith("Commit Already Exists");
+        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(6)]))).to.be.revertedWith("Commit Already Exists");
+        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(7)]))).to.be.revertedWith("Commit Already Exists");
+        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(8)]))).to.be.revertedWith("Commit Already Exists");
+        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(9)]))).to.be.revertedWith("Commit Already Exists");
+        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(10)]))).to.be.revertedWith("Commit Already Exists");
+        await expect(_contract.commitItem(ethers.utils.solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(11)]))).to.be.revertedWith("Commit Already Exists");
     })
 })
