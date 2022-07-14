@@ -115,16 +115,15 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
     /// @dev Sets Token URI for Backward Compatability with Marketplaces
     /// @dev Updates Number Of Items
     /// @dev Emits [NewItem] event
-    /// @param name description
-    /// @param description description
-    /// @param image description
-    /// @param animation description
-    /// @param beats description
-    /// @param playoffs description
-    /// @param tokenURI description
-    function addItem(uint8 tier, string memory name, string memory description, string memory image, string memory animation, uint256[] memory beats, uint256[] memory playoffs, string memory tokenURI) override external onlyAdmin {
+    /// @param name Name of the Item
+    /// @param description Description of the Item
+    /// @param image Image of the Item
+    /// @param animation Animation of the Item
+    /// @param beats List of who the token beats
+    /// @param tokenURI Gen I Token URI
+    function addItem(uint8 tier, string memory name, string memory description, string memory image, string memory animation, uint256[] memory beats, string memory tokenURI) override external onlyAdmin {
         uint256 _currentItemIndex = numberItems;
-        GameItemMetadata memory newItem = GameItemMetadata(tier, name, description, image, animation, beats, playoffs);
+        GameItemMetadata memory newItem = GameItemMetadata(tier, name, description, image, animation, beats);
         metadata[_currentItemIndex] = newItem;
         _setURI(_currentItemIndex, tokenURI);
         numberItems++;
