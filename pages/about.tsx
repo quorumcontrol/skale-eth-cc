@@ -6,7 +6,7 @@ const About:React.FC = () => {
   return (
     <Layout>
       <Heading>Welcome to the #skaleverse</Heading>
-      <Text>Skale, Paper, Scissors is lovingly created by a group of product builder on the SKALE network.</Text>
+      <Text>Skale, Paper, Scissors is lovingly created by a group of product builders on the SKALE network.</Text>
       {/* TODO: write up on the game? */}
       <Heading>Credits</Heading>
       <Text>Coding: <AppLink href="https://github.com/thegreataxios">TheGreatAxios</AppLink> and <AppLink href="https://github.com/tobowers">Topper Bowers</AppLink></Text>
