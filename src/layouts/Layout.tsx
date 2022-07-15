@@ -37,6 +37,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         </LinkBox>
         <Spacer display={['none', 'none', 'block', 'block']} />
         { isClient && canOnboard && <AppLink pt="2" href="/onboard">Onboard</AppLink> }
+        <AppLink pt="2" href="/about">About</AppLink>
         <Box ml="5">
           <ConnectButton showBalance={false} />
         </Box>
@@ -47,7 +48,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       </VStack>
       <Box as="footer" mt="200" textAlign="center">
         <Text fontSize="sm">
-            Created by ...
+            Lovingly created by a group of builders from the #skaleverse.
         </Text>
       </Box>
     </Container>

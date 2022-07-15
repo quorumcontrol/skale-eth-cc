@@ -31,8 +31,10 @@ export default function Home() {
   return (
     <Layout>
       <Heading>Welcome to Skale, Paper, Scissors</Heading>
-      <Text>Collect all the items for prizes!</Text>
-      <Text>Choose an item, find someone to play against, scan your codes. If you win, you get their item.</Text>
+      <Text>A classic game, reimagined on the zero-gas SKALE network </Text>
+      <Text>Find someone to play against, choose an item, scan a QR code.</Text>
+      <Text>If you win, you get their item.</Text>
+      <Text>Collect all the items to win $2022 in prizes.</Text>
       { isClient && address && tokens?.length === 0 && (
         <NextLink href="/signup">
           <Button>Signup</Button>
