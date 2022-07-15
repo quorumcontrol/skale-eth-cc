@@ -1,6 +1,6 @@
 import { BigNumber, providers, utils } from "ethers"
 import { useEffect, useMemo } from "react"
-import { useAccount, useProvider } from "wagmi"
+import { useAccount, useProvider, useSigner } from "wagmi"
 import { useMutation, useQuery } from 'react-query'
 import { GameItems, GameItems__factory } from "../../contracts/typechain-types"
 import { memoize } from "../utils/memoize"
@@ -49,10 +49,14 @@ export interface InventoryItem {
 }
 
 export const useDoOnboard = () => {
+  const { data:signer } = useSigner()
   const gameItems = useGameItemsContract()
 
   return useMutation(async (address:string) => {
-    const tx = await gameItems.initialMint(address, { value: utils.parseEther('0.5')})
+    if (!signer) {
+      throw new Error('no signer')
+    }
+    const tx = await gameItems.connect(signer).initialMint(address, { value: utils.parseEther('0.5')})
     console.log('onboard tx: ', tx.hash)
     const receipt = await tx.wait()
     console.log('receipt')
