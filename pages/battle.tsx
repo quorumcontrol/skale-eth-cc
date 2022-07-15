@@ -19,9 +19,9 @@ export default function Battle() {
 
   const onBattleComplete = useCallback((...args:any) => {
     console.log('battle complete: ', args)
-    const evt = args.slice(-1)
+    const evt = args[args.length - 1]
     router.push(`/battleComplete/${evt.transactionHash}`)
-  }, [])
+  }, [router])
   useOnBattleComplete(onBattleComplete)
 
   if (!isClient) {

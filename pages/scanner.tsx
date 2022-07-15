@@ -76,7 +76,7 @@ export default function Scanner() {
         <QrReader
           containerStyle={{ width: "100%", height: "100%" }}
           constraints={{
-            facingMode: "user",
+            facingMode: "environment",
           }}
           onResult={onResult}
         />

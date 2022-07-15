@@ -50,7 +50,10 @@ export const useBattleTransaction = (txHash?:string) => {
       if (!address || !allItems) {
         throw new Error('weirdly no address or allItems')
       }
+      console.log('fetching receipt for ', txHash)
       const receipt = await provider.getTransactionReceipt(txHash!)
+      console.log('receipt: ', receipt)
+
       const battleInterface = Battle__factory.createInterface()
       const evt = receipt.logs.find((log) => {
         return log.topics[0] === battleInterface.getEventTopic('BattleCompleted')

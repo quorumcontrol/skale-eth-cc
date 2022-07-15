@@ -97,12 +97,6 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
         _;
     }
 
-    /// @notice Additional Modifier to Allow Shared Access
-    modifier onlyViewNumberItems() {
-        require(hasRole(WIN_MANAGER_ROLE, msg.sender) || hasRole(ADMIN_ROLE, msg.sender), ACCESS_DENIED);
-        _;
-    }
-
     /// @notice Admin Function that enables the admin owner to add new tokens to the contract storage
     /// @dev Creates Metadata -> Stores as New Index
     /// @dev Sets Token URI for Backward Compatability with Marketplaces
@@ -150,7 +144,7 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
         return numberPlayers;
     }
 
-    function getNumberItems() external view onlyViewNumberItems returns (uint256) {
+    function getNumberItems() external view returns (uint256) {
         return numberItems;
     }
 
