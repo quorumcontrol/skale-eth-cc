@@ -20,14 +20,21 @@ const Onboard:React.FC = () => {
       if (!result || locked) {
         return
       }
-      locked = true
-      setLoading(true)
-      await doOnboard.mutateAsync(result.getText())
-      await router.push('/')
+      try {
+        locked = true
+        setLoading(true)
+        await doOnboard.mutateAsync(result.getText())
+        await router.push('/')
+      } catch (err) {
+        console.error('error with scan', err)
+        locked = false
+        setLoading(false)
+      }
+
     }
   })(), [loading])
 
-  if (!isClient || !canOnboard) {
+  if (!isClient || !canOnboard || loading) {
     return (
       <Layout>
         <Spinner />
@@ -42,7 +49,7 @@ const Onboard:React.FC = () => {
         <QrReader
           containerStyle={{ width: "100%", height: "100%" }}
           constraints={{
-            facingMode: "user",
+            facingMode: "environment",
           }}
           onResult={onResult}
         />
