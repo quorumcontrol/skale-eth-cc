@@ -1,11 +1,10 @@
-import { BigNumber, providers, utils } from "ethers"
+import { providers, utils } from "ethers"
 import { useEffect, useMemo } from "react"
 import { useAccount, useProvider, useSigner } from "wagmi"
 import { useMutation, useQuery } from 'react-query'
-import { GameItems, GameItems__factory } from "../../contracts/typechain-types"
+import { GameItems__factory } from "../../contracts/typechain-types"
 import { memoize } from "../utils/memoize"
 import { addresses } from "../utils/networkSelector"
-import ThenArg from "../utils/ThenArg"
 
 const gameItemsContract = memoize((provider:providers.Provider) => {
   const addr = addresses().GameItems
