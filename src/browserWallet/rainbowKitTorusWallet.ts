@@ -27,28 +27,6 @@ export const torusWallet = ({ chains }: any): Wallet => ({
           return chain.rpcUrls.default
         },
       },
-      qrCode: {
-        getUri: async () =>
-          // (await connector.getProvider()).connector.uri,
-          chain.rpcUrls.default,
-        instructions: {
-          learnMoreUrl: 'https://app.tor.us/',
-          steps: [
-            {
-              description:
-                'How do we turn this off?',
-              step: 'install',
-              title: 'Open the My Wallet app',
-            },
-            // {
-            //   description:
-            //     'After you scan, a connection prompt will appear for you to connect your wallet.',
-            //   step: 'scan',
-            //   title: 'Tap the scan button',
-            // },
-          ],
-        },
-      },
     };
   },
 });
