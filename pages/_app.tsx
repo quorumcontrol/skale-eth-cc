@@ -17,6 +17,7 @@ import "@rainbow-me/rainbowkit/styles.css";
 import "@fontsource/dm-sans";
 import { ChakraProvider } from "@chakra-ui/react";
 import theme from '../src/utils/theme'
+import { torusWallet } from "../src/browserWallet/rainbowKitTorusWallet";
 
 
 const needsInjectedWalletFallback =
@@ -60,6 +61,7 @@ const connectors = connectorsForWallets([
       wallet.metaMask({ chains }),
       wallet.coinbase({ chains, appName: 'Skale, Paper, Scissors' }),
       wallet.walletConnect({ chains }),
+      torusWallet({ chains }),
     ],
   },
 ]);
