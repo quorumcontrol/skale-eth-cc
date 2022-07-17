@@ -70,6 +70,11 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
     /// @param tier The [tier] that was unlocked
     event TierUnlocked(address indexed player, uint256 indexed tokenId, uint8 indexed tier);
 
+    /// @notice Emits a Winner event
+    /// @dev Fires once a player has all of the last tier of items
+    /// @param player the address of the winner
+    event Winner(address indexed player);
+
     constructor(address diceRollerContract) ERC1155("GameItems") {
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, msg.sender);
@@ -144,6 +149,7 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
         return numberPlayers;
     }
 
+    /// @notice Retrieves the Total Number of Items in the Game
     function getNumberItems() external view returns (uint256) {
         return numberItems;
     }
@@ -246,8 +252,23 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
             _internalMint(receiever, nextTierTokenId);
             emit TierUnlocked(receiever, nextTierTokenId, tier + 1);
         }
-        /// Else Nothing Since there is not another tier
-        
+
+        /// Else if Tier 3 Check For Winner
+        if (tier == 3) {
+            bool _isWinner = _checkWinner(receiever);
+            if (_isWinner) {
+                emit Winner(receiever);
+            }
+        }
+    }
+
+    function _checkWinner(address receiver) internal view returns (bool) {
+        for (uint256 i = 9; i < 12; i++) {
+            if (balanceOf(receiver, i) == 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
     function _checkTier(address receiver, uint256 tier) internal view returns (bool) {
