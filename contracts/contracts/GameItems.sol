@@ -145,11 +145,13 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
     }
 
     /// @notice Retreives the current number of players/holders
+    /// @return 
     function getNumberPlayers() override external view returns (uint256) {
         return numberPlayers;
     }
 
     /// @notice Retrieves the Total Number of Items in the Game
+    /// @return uint256 of the number of active game items
     function getNumberItems() external view returns (uint256) {
         return numberItems;
     }
@@ -168,13 +170,6 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
     function initialMint(address payable receiver) override external payable onlyMinter {
         require(_noBalances(receiver), INVALID_NEW_PLAYER);
 
-        // uint256[][] memory options = [
-        //     [uint256(0),1,2],
-        //     [uint256(1),2,3],
-        //     [uint256(2),3,4],
-        //     [uint256(0),2,4],
-        //     [uint256(1),3,4],
-        // ];
         uint256[3] memory opt1 = [uint256(0),1,2];
         uint256[3] memory opt2 = [uint256(1),2,3];
         uint256[3] memory opt3 = [uint256(2),3,4];
@@ -247,14 +242,14 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
         _internalMint(receiever, tokenId);
         /// Check The Tier of the Winner Item
         uint8 tier = metadata[tokenId].tier;
-        if ((tier == 1 || tier == 2) && _checkTier(receiever, tier)) {
+        if ((tier == 0 || tier == 1) && _checkTier(receiever, tier)) {
             uint256 nextTierTokenId = _randomTokenId(tier + 1);
             _internalMint(receiever, nextTierTokenId);
             emit TierUnlocked(receiever, nextTierTokenId, tier + 1);
         }
 
         /// Else if Tier 3 Check For Winner
-        if (tier == 3) {
+        if (tier == 2) {
             bool _isWinner = _checkWinner(receiever);
             if (_isWinner) {
                 emit Winner(receiever);
@@ -262,6 +257,9 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
         }
     }
 
+    /// @dev Checks if a player is a winner
+    /// @param receiver the player to check
+    /// @return bool if the player has completed Tier III
     function _checkWinner(address receiver) internal view returns (bool) {
         for (uint256 i = 9; i < 12; i++) {
             if (balanceOf(receiver, i) == 0) {
@@ -271,9 +269,14 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
         return true;
     }
 
+
+    /// @dev Checks if a player has completed the tier that is being checked
+    /// @param receiver the player to check
+    /// @param tier the tier to check
+    /// @return bool if the player has completed the tier
     function _checkTier(address receiver, uint256 tier) internal view returns (bool) {
-        uint256 start = tier == 1 ? 0 : 5;
-        uint256 stop = tier == 1 ? 5 : 9;
+        uint256 start = tier == 0 ? 0 : 5;
+        uint256 stop = tier == 0 ? 5 : 9;
         for (uint256 i = start; i < stop; i++) {
             if (balanceOf(receiver, i) == 0) {
                 return false;
@@ -310,10 +313,10 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
     /// @return uint256 of the tokenId Selected
     function _randomTokenId(uint8 tier) internal view returns (uint256) {
         /// Tier == 2 -> returns 5, 6, 7, 8
-        if (tier == 2) {
+        if (tier == 1) {
             return _getRandomNumber(5, 3);
         /// Tier == 3 -> returns 9, 10, 11
-        } else if (tier == 3) {
+        } else if (tier == 2) {
             return _getRandomNumber(9, 2);
         } else {
             return 0;
