@@ -1,24 +1,25 @@
-import { Heading, Spinner, Text } from '@chakra-ui/react'
-import { useRouter } from 'next/router'
-import { useBattleTransaction } from '../../src/hooks/useBattle'
-import useIsClientSide from '../../src/hooks/useIsClientSide'
-import Layout from "../../src/layouts/Layout"
+import { Heading, Spinner, Text } from "@chakra-ui/react";
+import { useRouter } from "next/router";
+import NFTCard from "../../src/components/NFTCard";
+import { useBattleTransaction } from "../../src/hooks/useBattle";
+import useIsClientSide from "../../src/hooks/useIsClientSide";
+import Layout from "../../src/layouts/Layout";
 
-const BattleComplete:React.FC = () => {
-  const router = useRouter()
-  const { txHash } = router.query
-  const { data } = useBattleTransaction(txHash as string|undefined)
-  const isClient = useIsClientSide()
+const BattleComplete: React.FC = () => {
+  const router = useRouter();
+  const { txHash } = router.query;
+  const { data } = useBattleTransaction(txHash as string | undefined);
+  const isClient = useIsClientSide();
 
   if (!isClient || !data) {
     return (
       <Layout>
         <Spinner />
       </Layout>
-    )
+    );
   }
 
-  console.log('results: ', data)
+  console.log("results: ", data);
   return (
     <Layout>
       {data.playerIsWinner && <Heading>You win!</Heading>}
@@ -26,13 +27,21 @@ const BattleComplete:React.FC = () => {
       {!data.draw && !data.playerIsWinner && <Heading>You lose.</Heading>}
       {!data.draw && (
         // TODO: here is where we would substitute "beats" with the verbs from the chart.
-        <Text>{data.winningItem.metadata.name} beats {data.losingItem.metadata.name}</Text>
+        <Text>
+          {data.winningItem.metadata.name} beats {data.losingItem.metadata.name}
+        </Text>
       )}
       {data.playerIsWinner && (
-        <Text>That means you&apos;ve collected a nice {data.losingItem.metadata.name}</Text>
+        <>
+          <Text>
+            That means you&apos;ve collected a nice{" "}
+            {data.losingItem.metadata.name}
+          </Text>
+          <NFTCard item={data.losingItem} />
+        </>
       )}
     </Layout>
-  )
-}
+  );
+};
 
-export default BattleComplete
+export default BattleComplete;

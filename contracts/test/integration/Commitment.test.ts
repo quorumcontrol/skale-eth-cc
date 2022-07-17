@@ -14,8 +14,12 @@ describe("Commit Item Deployment Test", () => {
     })
     it("Should Mint Items for P1 and P2", async() => {
         const { contract, rng1, rng2 } = await loadFixture(AddItemFixture);
-        await expect(contract.initialMint(rng1.address)).to.emit(contract, "NewPlayer");
-        await expect(contract.initialMint(rng2.address)).to.emit(contract, "NewPlayer");
+        await expect(contract.initialMint(rng1.address, {
+            gasLimit: ethers.utils.hexlify(5000000)
+        })).to.emit(contract, "NewPlayer");
+        await expect(contract.initialMint(rng2.address, {
+            gasLimit: ethers.utils.hexlify(5000000)
+        })).to.emit(contract, "NewPlayer");
     })
     it("Should Allow Commit of Items 0 for P1 and 2 P2", async() => {
         const { contract: gameItems, contract2: battle, rng1, rng2 } = await loadFixture(AddItemFixture);
@@ -24,6 +28,7 @@ describe("Commit Item Deployment Test", () => {
         
         const p1Hash: string = solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(0)]);
         const p2Hash: string =  solidityKeccak256(['bytes32', 'uint256'], [randomBytes(32), BigNumber.from(2)]);
+        
         await expect(battle.connect(rng1).commitItem(p1Hash)).to.emit(battle, "Committed");
         await expect(battle.connect(rng2).commitItem(p2Hash)).to.emit(battle, "Committed");
 

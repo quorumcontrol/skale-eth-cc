@@ -30,22 +30,22 @@ describe("Game Items Initial Mint Test", () => {
     it("Should Add 6 Items", async() => {
         const { contract, rng1 } = await loadFixture(deployContractFixture);
         await expect(
-            contract.addItem("0", "0", "0", "0", [], [], "")
+            contract.addItem(0, "0", "0", "0", "0", [], "")
         ).to.emit(contract, "NewItem").withArgs(BigNumber.from(0))
         await expect(
-            contract.addItem("1", "1", "1", "1", [], [], "")
+            contract.addItem(1, "1", "1", "1", "1", [], "")
         ).to.emit(contract, "NewItem").withArgs(BigNumber.from(1))
         await expect(
-            contract.addItem("2", "2", "2", "2", [], [], "")
+            contract.addItem(2, "2", "2", "2", "2", [], "")
         ).to.emit(contract, "NewItem").withArgs(BigNumber.from(2))
         await expect(
-            contract.addItem("3", "3", "3", "3", [], [], "")
+            contract.addItem(3, "3", "3", "3", "3", [], "")
         ).to.emit(contract, "NewItem").withArgs(BigNumber.from(3))
         await expect(
-            contract.addItem("4", "4", "4", "4", [], [], "")
+            contract.addItem(4, "4", "4", "4", "4", [], "")
         ).to.emit(contract, "NewItem").withArgs(BigNumber.from(4))
         await expect(
-            contract.addItem("5", "5", "5", "5", [], [], "")
+            contract.addItem(5, "5", "5", "5", "5", [], "")
         ).to.emit(contract, "NewItem").withArgs(BigNumber.from(5))
         
         /// This Section Mints and Works

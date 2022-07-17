@@ -19,9 +19,9 @@ export default function Battle() {
 
   const onBattleComplete = useCallback((...args:any) => {
     console.log('battle complete: ', args)
-    const evt = args.slice(-1)
+    const evt = args[args.length - 1]
     router.push(`/battleComplete/${evt.transactionHash}`)
-  }, [])
+  }, [router])
   useOnBattleComplete(onBattleComplete)
 
   if (!isClient) {
@@ -43,7 +43,7 @@ export default function Battle() {
   if (!commitment || !commitment.isCommitted) {
     return (
       <Layout>
-        <Text>Looks like you haven't chosen an item yet.</Text>
+        <Text>Looks like you haven&apos;t chosen an item yet.</Text>
         <AppLink href="/inventory">Go back to inventory.</AppLink>
       </Layout>
     );

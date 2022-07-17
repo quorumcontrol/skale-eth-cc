@@ -34,7 +34,6 @@ const func: DeployFunction = async function ({
         item.image,
         item.animation,
         item.beats,
-        item.playOffs,
         item.tokenURI
       );
     }

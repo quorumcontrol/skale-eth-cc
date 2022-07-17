@@ -1,11 +1,10 @@
-import { BigNumber, providers } from "ethers"
+import { providers, utils } from "ethers"
 import { useEffect, useMemo } from "react"
-import { useAccount, useProvider } from "wagmi"
-import { useQuery } from 'react-query'
-import { GameItems, GameItems__factory } from "../../contracts/typechain-types"
+import { useAccount, useProvider, useSigner } from "wagmi"
+import { useMutation, useQuery } from 'react-query'
+import { GameItems__factory } from "../../contracts/typechain-types"
 import { memoize } from "../utils/memoize"
 import { addresses } from "../utils/networkSelector"
-import ThenArg from "../utils/ThenArg"
 
 const gameItemsContract = memoize((provider:providers.Provider) => {
   const addr = addresses().GameItems
@@ -33,7 +32,7 @@ export const useOnSignedUp = (onSignedUp:()=>any) => {
     return () => {
       gameItems.off(filter, onSignedUp)
     }
-  }, [address, gameItems])
+  }, [address, gameItems, onSignedUp])
 }
 
 export interface Metadata {
@@ -46,6 +45,43 @@ export interface Metadata {
 export interface InventoryItem {
   id: number,
   metadata: Metadata
+}
+
+export const useDoOnboard = () => {
+  const { data:signer } = useSigner()
+  const gameItems = useGameItemsContract()
+
+  return useMutation(async (address:string) => {
+    if (!signer) {
+      throw new Error('no signer')
+    }
+    // gas ranges due to a loop, so giving a bunch of gas manually here
+    // see https://whispering-turais.testnet-explorer.skalenodes.com/tx/0x9a89e86e271f02531b279559b966a76cd1124c634924b3934023e0b701032f73/token-transfers
+    // for a working Tx
+    const tx = await gameItems.connect(signer).initialMint(address, { gasLimit: utils.parseUnits('300000', 'gwei'), value: utils.parseEther('0.5')})
+    console.log('onboard tx: ', tx.hash)
+    const receipt = await tx.wait()
+    console.log('receipt')
+    return receipt
+  })
+}
+
+export const useCanOnboard = () => {
+  const gameItems = useGameItemsContract()
+  const { address } = useAccount()
+
+  return useQuery(['can-onboard', address],
+  async () => {
+    const minterRole = await gameItems.MINTER_ROLE()
+    const hasRole = await gameItems.hasRole(minterRole, address!)
+
+    console.log("has role? ", hasRole)
+
+    return hasRole
+  },
+  {
+    enabled: !!address
+  })
 }
 
 export const useAllItems = () => {
