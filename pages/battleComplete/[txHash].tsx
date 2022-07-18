@@ -6,7 +6,7 @@ import { useBattleTransaction } from "../../src/hooks/useBattle";
 import { InventoryItem } from "../../src/hooks/useGameItems";
 import useIsClientSide from "../../src/hooks/useIsClientSide";
 import Layout from "../../src/layouts/Layout";
-import verbs, { randomPlayoffVerb } from "../../src/utils/verbs";
+import { verbs, randomPlayoffVerb } from "../../src/utils/verbs";
 
 const CollectedItems: React.FC<{ items: InventoryItem[] }> = ({ items }) => {
   if (items.length === 1) {
