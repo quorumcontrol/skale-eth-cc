@@ -1,16 +1,17 @@
-import { BigNumber, constants, Signer } from "ethers"
+import { BigNumber, constants, Signer, providers } from "ethers"
 import { useEffect, useMemo } from "react"
 import { useAccount, useProvider, useSigner } from "wagmi"
-import { Battle__factory } from "../../contracts/typechain-types"
+import { Battle__factory, GameItems__factory } from "../../contracts/typechain-types"
 import { memoize } from "../utils/memoize"
 import { addresses } from "../utils/networkSelector"
 import { useQuery, useMutation, useQueryClient } from 'react-query'
 import { randomBytes } from "crypto"
 import { BytesLike, defaultAbiCoder, solidityKeccak256 } from "ethers/lib/utils"
-import { TypedListener } from "../../contracts/typechain-types/common"
+import {  TypedListener } from "../../contracts/typechain-types/common"
 import { BattleCompletedEvent } from "../../contracts/typechain-types/contracts/Battle"
 import useWebsocketProvider from "./useWebsocketProvider"
 import { useAllItems } from "./useGameItems"
+import { TransferSingleEvent } from "../../contracts/typechain-types/contracts/GameItems"
 
 const LOCAL_STORAGE_SALT_KEY = 'bps:salt'
 const LOCAL_STORAGE_TOKEN_KEY = 'bps:tokenId'
@@ -31,13 +32,35 @@ export const useBattleContract = () => {
   }, [signer])
 }
 
-// event BattleCompleted(
-//   address indexed playerOne,
-//   address indexed playerTwo,
-//   uint8 result,
-//   uint256 playerOneItem,
-//   uint256 playerTwoItem
-// );
+const battleInterface = Battle__factory.createInterface()
+const battleCompletedTopic = battleInterface.getEventTopic('BattleCompleted')
+
+const findBattleCompleted = (receipt:providers.TransactionReceipt) => {
+  const evt = receipt.logs.find((log) => {
+    return log.topics[0] === battleCompletedTopic
+  })
+  if (!evt) {
+    throw new Error('bad transaction hash: missing topic')
+  }
+  const parsedEvt = battleInterface.parseLog(evt)
+  console.log('parsed event: ', parsedEvt)
+  return parsedEvt as unknown as  BattleCompletedEvent
+}
+
+const gameItemsInterface = GameItems__factory.createInterface()
+const transferSingleTopic = gameItemsInterface.getEventTopic('TransferSingle')
+
+const findMintedTokenEvents = (receipt:providers.TransactionReceipt) => {
+  const evts = receipt.logs.filter((log) => {
+    return log.topics[0] === transferSingleTopic
+  })
+  if (!evts || evts.length === 0) {
+    throw new Error('bad transaction hash: missing topic')
+  }
+  const parsedEvts = evts.map((evt) => gameItemsInterface.parseLog(evt))
+  console.log('parsed events: ', parsedEvts)
+  return parsedEvts as unknown as  TransferSingleEvent[]
+}
 
 export const useBattleTransaction = (txHash?:string) => {
   const provider = useProvider()
@@ -54,18 +77,13 @@ export const useBattleTransaction = (txHash?:string) => {
       const receipt = await provider.getTransactionReceipt(txHash!)
       console.log('receipt: ', receipt)
 
-      const battleInterface = Battle__factory.createInterface()
-      const evt = receipt.logs.find((log) => {
-        return log.topics[0] === battleInterface.getEventTopic('BattleCompleted')
+      const completedEvent = findBattleCompleted(receipt)
+      const mintedTokenEvents = findMintedTokenEvents(receipt)
+      const mintedTokens = mintedTokenEvents.map((evt) => {
+        return allItems[evt.args.id.toNumber()]
       })
-      if (!evt) {
-        throw new Error('bad transaction hash: missing topic')
-      }
-      const parsedEvt = battleInterface.parseLog(evt)
-      console.log('parsed event: ', parsedEvt)
-
-      const isPlayerOne = parsedEvt.args.playerOne.toLowerCase() === address.toLowerCase()
-      const args = parsedEvt.args
+      const isPlayerOne = completedEvent.args.playerOne.toLowerCase() === address.toLowerCase()
+      const args = completedEvent.args
 
       const myItemId = isPlayerOne ? args.playerOneItem : args.playerTwoItem
       const opponentItemId = isPlayerOne ? args.playerTwoItem : args.playerOneItem
@@ -82,6 +100,7 @@ export const useBattleTransaction = (txHash?:string) => {
         opponentItem,
         winningItem: playerIsWinner ? myItem : opponentItem,
         losingItem: playerIsWinner ? opponentItem : myItem,
+        mintedTokens,
       }
     },
     {
