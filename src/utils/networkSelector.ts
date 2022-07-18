@@ -1,4 +1,4 @@
-import { localhost, skaleTestnet } from './SkaleChains'
+import { calypsoHub, localhost, skaleTestnet } from './SkaleChains'
 
 export enum chainEnvs {
   local = 'local',
@@ -19,6 +19,8 @@ export function addresses() {
       }
     case chainEnvs.test:
       return require('../../contracts/deployments/skaletest/addresses.json')
+    case chainEnvs.prod:
+      return require('../../contracts/deployments/calypso/addresses.json')
     default:
       throw new Error("UI doesn't yet support that chain")
   }
@@ -30,6 +32,8 @@ export function defaultNetwork() {
       return localhost
     case chainEnvs.test:
       return skaleTestnet
+    case chainEnvs.prod:
+      return calypsoHub
     default:
       throw new Error('unsupported chain env')
   }

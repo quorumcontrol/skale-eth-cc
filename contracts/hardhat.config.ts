@@ -20,6 +20,12 @@ const config: HardhatUserConfig = {
         process.env.TESTNET_PRIVATE_KEY,
       ].filter((k) => !!k) as string[],
     },
+    calypso: {
+      url: "https://mainnet.skalenodes.com/v1/honorable-steel-rasalhague",
+      accounts: [
+        process.env.MAINNET_PRIVATE_KEY,
+      ].filter((k) => !!k) as string[],
+    },
   }
 };
 

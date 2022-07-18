@@ -22,6 +22,27 @@ export const skaleTestnet: Chain = {
   testnet: true,
 };
 
+export const calypsoHub: Chain = {
+  id: 1564830818,
+  name: 'Calypso Hub',
+  network: 'calypso-hub',
+  iconUrl: skaleLogo.path,
+  iconBackground: '#fff',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'sFUEL',
+    symbol: 'sFUEL',
+  },
+  rpcUrls: {
+    default: 'https://mainnet.skalenodes.com/v1/honorable-steel-rasalhague',
+    wss: 'wss://mainnet.skalenodes.com/v1/ws/honorable-steel-rasalhague',
+  },
+  blockExplorers: {
+    default: { name: 'BlockScout', url: 'https://honorable-steel-rasalhague.explorer.mainnet.skalenodes.com/' },
+  },
+  testnet: false,
+};
+
 export const localhost: Chain = {
   id: 31337,
   name: 'Localhost',
