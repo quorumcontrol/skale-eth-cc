@@ -2,8 +2,11 @@ import { Heading, Text, Box, VStack } from "@chakra-ui/react"
 import AppLink from "../src/components/AppLink"
 import Layout from "../src/layouts/Layout"
 import PaddedQRCode from "../src/components/PaddedQRCode";
+import useIsClientSide from "../src/hooks/useIsClientSide";
 
 const About:React.FC = () => {
+  const isClient = useIsClientSide()
+
   return (
     <Layout>
       <Heading>Welcome to the #skaleverse</Heading>
@@ -27,7 +30,7 @@ const About:React.FC = () => {
         <Text>Pepper: <AppLink href="https://sketchfab.com/animator12">animator12</AppLink></Text>
         <Text>Polar Bear: <AppLink href="https://sketchfab.com/turunmuseokeskus">turunmuseokeskus</AppLink></Text>
       </VStack>
-      <PaddedQRCode value={`${window.location.protocol}//${window.location.host}${window.location.port ? `:${window.location.port}` : ''}`} />
+      {isClient && <PaddedQRCode value={typeof window === 'undefined' ? 'https://sps.calypsohub.network' : `${window.location.protocol}//${window.location.host}${window.location.port ? `:${window.location.port}` : ''}`} />}
     </Layout>
   )
 }
