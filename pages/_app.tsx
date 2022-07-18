@@ -10,8 +10,8 @@ import {
   connectorsForWallets,
   wallet,
 } from "@rainbow-me/rainbowkit";
-import { activeChain, chainEnvs } from "../src/utils/networkSelector";
-import { localhost, skaleTestnet } from "../src/utils/SkaleChains";
+import { defaultNetwork } from "../src/utils/networkSelector";
+import { calypsoHub, localhost, skaleTestnet } from "../src/utils/SkaleChains";
 
 import "@rainbow-me/rainbowkit/styles.css";
 import "@fontsource/dm-sans";
@@ -19,27 +19,16 @@ import { ChakraProvider } from "@chakra-ui/react";
 import theme from '../src/utils/theme'
 import { torusWallet } from "../src/browserWallet/rainbowKitTorusWallet";
 
-function getChain() {
-  switch (activeChain) {
-    case chainEnvs.local:
-      return [localhost];
-    case chainEnvs.test:
-      return [skaleTestnet];
-    default:
-      throw new Error("unsupported env for now");
-  }
-}
-
-const { chains, provider } = configureChains(getChain(), [
+const { chains, provider } = configureChains([defaultNetwork()], [
   jsonRpcProvider({
     rpc: (chain) => {
       switch (chain.id) {
         case skaleTestnet.id:
           return { http: chain.rpcUrls.default };
+        case calypsoHub.id:
+          return { http: chain.rpcUrls.default };
         case localhost.id:
           return { http: chain.rpcUrls.default };
-        // case skaleMainnet.id:
-        //     return { http: chain.rpcUrls.default };
         default:
           return null;
       }
