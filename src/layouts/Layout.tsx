@@ -36,8 +36,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           </NextLink>
         </LinkBox>
         <Spacer display={['none', 'none', 'block', 'block']} />
-        { isClient && canOnboard && <AppLink pt="2" href="/onboard">Onboard</AppLink> }
-        <AppLink pt="2" href="/about">About</AppLink>
+        { isClient && canOnboard && <AppLink pt="1.5" href="/onboard">Onboard</AppLink> }
+        <AppLink pt="1.5" href="/about">About</AppLink>
         <Box ml="5">
           <ConnectButton showBalance={false} />
         </Box>
