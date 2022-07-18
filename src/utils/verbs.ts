@@ -1,5 +1,18 @@
 
-const verbs = {
+
+export const playOffVerbs = [
+  'poetry slam',
+  'stare off',
+  'round of pictionary',
+  'dice game',
+  'three legged race'
+]
+
+export function randomPlayoffVerb() {
+  return playOffVerbs[Math.floor(Math.random()*playOffVerbs.length)];
+}
+
+export const verbs:Record<number, Record<number, string>> = {
   0: {
     2: "smashes",
     3: "crushes",
@@ -75,6 +88,3 @@ const verbs = {
     10: "blinds",
   }
 }
-
-
-export default verbs

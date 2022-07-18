@@ -6,6 +6,7 @@ import { useBattleTransaction } from "../../src/hooks/useBattle";
 import { InventoryItem } from "../../src/hooks/useGameItems";
 import useIsClientSide from "../../src/hooks/useIsClientSide";
 import Layout from "../../src/layouts/Layout";
+import verbs, { randomPlayoffVerb } from "../../src/utils/verbs";
 
 const CollectedItems: React.FC<{ items: InventoryItem[] }> = ({ items }) => {
   if (items.length === 1) {
@@ -29,11 +30,16 @@ const CollectedItems: React.FC<{ items: InventoryItem[] }> = ({ items }) => {
   );
 };
 
+const Verb:React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return <Text textTransform="uppercase">{children}</Text>
+}
+
 const BattleComplete: React.FC = () => {
   const router = useRouter();
   const { txHash } = router.query;
   const { data } = useBattleTransaction(txHash as string | undefined);
   const isClient = useIsClientSide();
+  const verb = data && (verbs[data.winningItem.id] || {})[data.losingItem.id]
 
   if (!isClient || !data) {
     return (
@@ -51,10 +57,14 @@ const BattleComplete: React.FC = () => {
       {data.draw && <Heading>Draw! Battle again one day.</Heading>}
       {!data.draw && !data.playerIsWinner && <Heading>You lose.</Heading>}
       <AppLink href="/inventory">&lt; Back to inventory</AppLink>
-      {!data.draw && (
-        // TODO: here is where we would substitute "beats" with the verbs from the chart.
+      {!data.draw && verb && (
         <Text>
-          {data.winningItem.metadata.name} beats {data.losingItem.metadata.name}
+          {data.winningItem.metadata.name} <Verb>{verb}</Verb> {data.losingItem.metadata.name}
+        </Text>
+      )}
+      {!data.draw && !verb && (
+        <Text>
+          {data.winningItem.metadata.name} beat {data.losingItem.metadata.name} in a <Verb>{randomPlayoffVerb()}</Verb>
         </Text>
       )}
       {data.playerIsWinner && <CollectedItems items={data.mintedTokens} />}
