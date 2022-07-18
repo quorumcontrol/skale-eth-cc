@@ -52,7 +52,7 @@ const BattleComplete: React.FC = () => {
   console.log("results: ", data);
   return (
     <Layout>
-      <Box width="100%"><AppLink href="/inventory">&lt; Back to inventory</AppLink></Box>
+      <Box width="100%"><AppLink href="/inventory">&lt; Play again</AppLink></Box>
       {data.playerIsWinner && <Heading>You win!</Heading>}
       {data.tierUnlocked && <Heading>Tier Unlocked!</Heading>}
       {data.draw && <Heading>Draw! Battle again one day.</Heading>}
