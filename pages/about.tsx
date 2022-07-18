@@ -1,6 +1,7 @@
 import { Heading, Text, Box, VStack } from "@chakra-ui/react"
 import AppLink from "../src/components/AppLink"
 import Layout from "../src/layouts/Layout"
+import PaddedQRCode from "../src/components/PaddedQRCode";
 
 const About:React.FC = () => {
   return (
@@ -26,6 +27,7 @@ const About:React.FC = () => {
         <Text>Pepper: <AppLink href="https://sketchfab.com/animator12">animator12</AppLink></Text>
         <Text>Polar Bear: <AppLink href="https://sketchfab.com/turunmuseokeskus">turunmuseokeskus</AppLink></Text>
       </VStack>
+      <PaddedQRCode value={`${window.location.protocol}//${window.location.host}${window.location.port ? `:${window.location.port}` : ''}`} />
     </Layout>
   )
 }
