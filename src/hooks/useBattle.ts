@@ -140,19 +140,24 @@ export const useOnBattleComplete = (onBattleComplete:TypedListener<BattleComplet
     if (!battle || !address) {
       return
     }
+
+    const handler:TypedListener<BattleCompletedEvent> = (...args) => {
+      onBattleComplete(...args)
+    }
+
     // const wssBattle = battle.connect(websocketProvider)
     const wssBattle = battle // TODO: testing to see if using a non-websocket helps this.
-    
+
     console.log('subscribing to battleCompleted: ', address)
     const p1Filter = wssBattle.filters.BattleCompleted(address, null, null, null, null)
     const p2Filter = wssBattle.filters.BattleCompleted(null, address, null, null, null)
 
-    wssBattle.on(p1Filter, onBattleComplete)
-    wssBattle.on(p2Filter, onBattleComplete)
+    wssBattle.on(p1Filter, handler)
+    wssBattle.on(p2Filter, handler)
     return () => {
       console.log('unsubscribing from battle completed')
-      wssBattle.off(p1Filter, onBattleComplete)
-      wssBattle.off(p2Filter, onBattleComplete)
+      wssBattle.off(p1Filter, handler)
+      wssBattle.off(p2Filter, handler)
     }
   }, [battle, address, onBattleComplete, websocketProvider])
 }
