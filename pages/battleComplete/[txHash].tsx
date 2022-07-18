@@ -1,9 +1,33 @@
 import { Heading, Spinner, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
+import AppLink from "../../src/components/AppLink";
 import NFTCard from "../../src/components/NFTCard";
 import { useBattleTransaction } from "../../src/hooks/useBattle";
+import { InventoryItem } from "../../src/hooks/useGameItems";
 import useIsClientSide from "../../src/hooks/useIsClientSide";
 import Layout from "../../src/layouts/Layout";
+
+const CollectedItems: React.FC<{ items: InventoryItem[] }> = ({ items }) => {
+  if (items.length === 1) {
+    return (
+      <>
+        <Text>
+          That means you&apos;ve collected a nice {items[0].metadata.name}.
+        </Text>
+        <NFTCard item={items[0]} />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <Text>You&apos;ve collected items!</Text>
+      {items.map((item) => {
+        return <NFTCard item={item} key={`battle-completed-${item.id}`} />;
+      })}
+    </>
+  );
+};
 
 const BattleComplete: React.FC = () => {
   const router = useRouter();
@@ -23,23 +47,17 @@ const BattleComplete: React.FC = () => {
   return (
     <Layout>
       {data.playerIsWinner && <Heading>You win!</Heading>}
+      {data.tierUnlocked && <Heading>Tier Unlocked!</Heading>}
       {data.draw && <Heading>Draw! Battle again one day.</Heading>}
       {!data.draw && !data.playerIsWinner && <Heading>You lose.</Heading>}
+      <AppLink href="/inventory">&lt; Back to inventory</AppLink>
       {!data.draw && (
         // TODO: here is where we would substitute "beats" with the verbs from the chart.
         <Text>
           {data.winningItem.metadata.name} beats {data.losingItem.metadata.name}
         </Text>
       )}
-      {data.playerIsWinner && (
-        <>
-          <Text>
-            That means you&apos;ve collected a nice{" "}
-            {data.losingItem.metadata.name}
-          </Text>
-          <NFTCard item={data.losingItem} />
-        </>
-      )}
+      {data.playerIsWinner && <CollectedItems items={data.mintedTokens} />}
     </Layout>
   );
 };

@@ -21,6 +21,7 @@ interface VideoProps extends BoxProps {
   autoPlay?: boolean
   loop?: boolean
   muted?: boolean
+  playsInline?: boolean
 }
 
 const Video: React.FC<VideoProps> = (props) => {

@@ -98,7 +98,7 @@ export const useAllItems = () => {
           animationUrl: item.animationUrl,
           description: item.description,
         },
-      }
+      } as InventoryItem
     }))
   })
 }

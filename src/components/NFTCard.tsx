@@ -15,7 +15,7 @@ const NFTCard: React.FC<{ item: InventoryItem, onChoose?:(tokenId:number) => any
     >
       <Box h="70%" backgroundColor="#000">
         {typeFromUrl(animationUrl) ? (
-          <Video animationUrl={animationUrl} controls={false} autoPlay loop muted />
+          <Video animationUrl={animationUrl} controls={false} autoPlay loop muted playsInline />
         ) : (
           <Image
             src={ipfsToWeb(image)}

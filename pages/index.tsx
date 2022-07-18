@@ -40,7 +40,7 @@ export default function Home() {
         </NextLink>
       )}
       <Box>
-        <Video animationUrl="/promoVid.mp4" autoPlay controls></Video>
+        <Video animationUrl="/promoVid.mp4" autoPlay controls muted playsInline></Video>
       </Box>
       <Text>A classic game, reimagined on the zero-gas SKALE network </Text>
       <Text>Find someone to play against, choose an item, scan a QR code.</Text>
