@@ -347,6 +347,7 @@ export interface GameItemsInterface extends utils.Interface {
     "TransferBatch(address,address,address,uint256[],uint256[])": EventFragment;
     "TransferSingle(address,address,address,uint256,uint256)": EventFragment;
     "URI(string,uint256)": EventFragment;
+    "Winner(address)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
@@ -359,6 +360,7 @@ export interface GameItemsInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "TransferBatch"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TransferSingle"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "URI"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Winner"): EventFragment;
 }
 
 export interface ApprovalForAllEventObject {
@@ -475,6 +477,13 @@ export interface URIEventObject {
 export type URIEvent = TypedEvent<[string, BigNumber], URIEventObject>;
 
 export type URIEventFilter = TypedEventFilter<URIEvent>;
+
+export interface WinnerEventObject {
+  player: string;
+}
+export type WinnerEvent = TypedEvent<[string], WinnerEventObject>;
+
+export type WinnerEventFilter = TypedEventFilter<WinnerEvent>;
 
 export interface GameItems extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -1049,6 +1058,11 @@ export interface GameItems extends BaseContract {
       id?: PromiseOrValue<BigNumberish> | null
     ): URIEventFilter;
     URI(value?: null, id?: PromiseOrValue<BigNumberish> | null): URIEventFilter;
+
+    "Winner(address)"(
+      player?: PromiseOrValue<string> | null
+    ): WinnerEventFilter;
+    Winner(player?: PromiseOrValue<string> | null): WinnerEventFilter;
   };
 
   estimateGas: {
