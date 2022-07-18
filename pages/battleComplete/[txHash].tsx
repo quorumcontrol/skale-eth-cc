@@ -1,4 +1,4 @@
-import { Heading, Spinner, Text } from "@chakra-ui/react";
+import { Box, Heading, Spinner, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import AppLink from "../../src/components/AppLink";
 import NFTCard from "../../src/components/NFTCard";
@@ -31,7 +31,7 @@ const CollectedItems: React.FC<{ items: InventoryItem[] }> = ({ items }) => {
 };
 
 const Verb:React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  return <Text textTransform="uppercase">{children}</Text>
+  return <Box as="span" textTransform="uppercase">{children}</Box>
 }
 
 const BattleComplete: React.FC = () => {
@@ -52,11 +52,11 @@ const BattleComplete: React.FC = () => {
   console.log("results: ", data);
   return (
     <Layout>
+      <Box width="100%"><AppLink href="/inventory">&lt; Back to inventory</AppLink></Box>
       {data.playerIsWinner && <Heading>You win!</Heading>}
       {data.tierUnlocked && <Heading>Tier Unlocked!</Heading>}
       {data.draw && <Heading>Draw! Battle again one day.</Heading>}
       {!data.draw && !data.playerIsWinner && <Heading>You lose.</Heading>}
-      <AppLink href="/inventory">&lt; Back to inventory</AppLink>
       {!data.draw && verb && (
         <Text>
           {data.winningItem.metadata.name} <Verb>{verb}</Verb> {data.losingItem.metadata.name}
