@@ -35,6 +35,8 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
     uint256 private numberPlayers;
     /// @notice The storage of the shared items on-chain #SKALE
     mapping(uint256 => GameItemMetadata) private metadata;
+    /// @notice The mapping for tier unlocked
+    mapping(uint256 => mapping(address => bool)) private tierTracker;
 
     /// @notice Modifier Error String
     string private constant ACCESS_DENIED = "Access Denied";
@@ -242,16 +244,18 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
         _internalMint(receiever, tokenId);
         /// Check The Tier of the Winner Item
         uint8 tier = metadata[tokenId].tier;
-        if ((tier == 0 || tier == 1) && _checkTier(receiever, tier)) {
+        if ((tier == 0 || tier == 1) && _checkTier(receiever, tier) && !_tierUnlocked(receiever, tier + 1)) {
             uint256 nextTierTokenId = _randomTokenId(tier + 1);
             _internalMint(receiever, nextTierTokenId);
+            _unlockTier(receiever,  tier + 1);
             emit TierUnlocked(receiever, nextTierTokenId, tier + 1);
         }
 
         /// Else if Tier 3 Check For Winner
-        if (tier == 2) {
+        if (tier == 2 && !_tierUnlocked(receiever, 3)) {
             bool _isWinner = _checkWinner(receiever);
             if (_isWinner) {
+                _unlockTier(receiever, 3);
                 emit Winner(receiever);
             }
         }
@@ -331,5 +335,21 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
         uint256 _rng = minNumber + (uint256(diceRoller.getRandom()) % maxNumber);
         return _rng;
     }
+
+    /// @notice Checks if User has unlocked a tier
+    /// @param player address
+    /// @param tier uint8 of the tier
+    /// @return bool true if the user has already unlocked a tier or if they won
+    function _tierUnlocked(address player, uint8 tier) internal view returns (bool) {
+        return tierTracker[tier][player];
+    }
+
+    /// @notice Unlocks Tier for PLayer
+    /// @param player address
+    /// @param tier uint8 of the tier
+    function _unlockTier(address player, uint8 tier) internal {
+        tierTracker[tier][player] = true;
+    }
+
     
 }
