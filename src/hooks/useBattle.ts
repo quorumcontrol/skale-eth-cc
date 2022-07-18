@@ -140,8 +140,9 @@ export const useOnBattleComplete = (onBattleComplete:TypedListener<BattleComplet
     if (!battle || !address) {
       return
     }
-    const wssBattle = battle.connect(websocketProvider)
-
+    // const wssBattle = battle.connect(websocketProvider)
+    const wssBattle = battle // TODO: testing to see if using a non-websocket helps this.
+    
     console.log('subscribing to battleCompleted: ', address)
     const p1Filter = wssBattle.filters.BattleCompleted(address, null, null, null, null)
     const p2Filter = wssBattle.filters.BattleCompleted(null, address, null, null, null)
