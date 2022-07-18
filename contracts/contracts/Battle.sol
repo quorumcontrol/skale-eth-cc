@@ -57,6 +57,12 @@ contract Battle {
         uint256 playerOneItem,
         uint256 playerTwoItem
     );
+
+    event SaltUsed(
+        bytes32 indexed playerOneSalt,
+        bytes32 indexed playerTwoSalt
+    );
+
     /// @notice Emits a Cheater
     event Cheater(address indexed cheater);
     /// @notice Emits a New Commited Item
@@ -101,6 +107,9 @@ contract Battle {
 
         require(committed[p1] == p1Commitment, "P1 Commitment Mismatched");
         require(committed[p2] == p2Commitment, "P2 Commitment Mismatched");
+
+        // This goes here because the salts are used even in the event that there's chating going on.
+        emit SaltUsed(p1Salt, p2Salt);
 
         if (_gameItemsContract.balanceOf(p1, p1TokenId) == 0) {
             _removeCommitment(p1);
