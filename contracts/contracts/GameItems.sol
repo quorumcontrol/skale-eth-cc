@@ -245,11 +245,11 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
     function winBattle(address receiever, uint256 tokenId) override external onlyWinManager {
         /// Check The Tier of the Winner Item
         uint8 tier = metadata[tokenId].tier;
-        bool _hasTokenInTier = _checkTier(receiever, tier);
+        bool _emptyTier = _isEmptyTier(receiever, tier);
         /// Run Internal Mint for the Winner
         _internalMint(receiever, tokenId);
         
-        if (!_hasTokenInTier && tier != 2) {
+        if (_emptyTier && tier != 2) {
             _unlockTier(receiever,  tier);
             emit TierUnlocked(receiever, tokenId, tier);
         } else if ((tier == 0 || tier == 1) && _checkTier(receiever, tier) && !_tierUnlocked(receiever, tier + 1)) {
@@ -280,6 +280,22 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
                 return false;
             }
         }
+        return true;
+    }
+
+    /// @dev Checks if a player has an empty tier
+    /// @param receiver the player to check
+    /// @param tier the tier to check
+    /// @return bool if the player has completed the tier
+    function _isEmptyTier(address receiver, uint256 tier) internal view returns (bool) {
+        uint256 start = tier == 0 ? 0 : 5;
+        uint256 stop = tier == 0 ? 5 : 9;
+        for (uint256 i = start; i < stop; i++) {
+            if (balanceOf(receiver, i) > 0) {
+                return false;
+            }
+        }
+
         return true;
     }
 
