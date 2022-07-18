@@ -1,5 +1,6 @@
 import { Heading, Spinner, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
+import AppLink from "../../src/components/AppLink";
 import NFTCard from "../../src/components/NFTCard";
 import { useBattleTransaction } from "../../src/hooks/useBattle";
 import { InventoryItem } from "../../src/hooks/useGameItems";
@@ -46,8 +47,10 @@ const BattleComplete: React.FC = () => {
   return (
     <Layout>
       {data.playerIsWinner && <Heading>You win!</Heading>}
+      {data.tierUnlocked && <Heading>Tier Unlocked!</Heading>}
       {data.draw && <Heading>Draw! Battle again one day.</Heading>}
       {!data.draw && !data.playerIsWinner && <Heading>You lose.</Heading>}
+      <AppLink href="/inventory">&lt; Back to inventory</AppLink>
       {!data.draw && (
         // TODO: here is where we would substitute "beats" with the verbs from the chart.
         <Text>

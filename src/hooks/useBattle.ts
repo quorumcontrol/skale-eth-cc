@@ -11,10 +11,17 @@ import {  TypedListener } from "../../contracts/typechain-types/common"
 import { BattleCompletedEvent } from "../../contracts/typechain-types/contracts/Battle"
 import useWebsocketProvider from "./useWebsocketProvider"
 import { useAllItems } from "./useGameItems"
-import { TransferSingleEvent } from "../../contracts/typechain-types/contracts/GameItems"
+import { TierUnlockedEvent, TransferSingleEvent } from "../../contracts/typechain-types/contracts/GameItems"
 
 const LOCAL_STORAGE_SALT_KEY = 'bps:salt'
 const LOCAL_STORAGE_TOKEN_KEY = 'bps:tokenId'
+
+const battleInterface = Battle__factory.createInterface()
+const battleCompletedTopic = battleInterface.getEventTopic('BattleCompleted')
+
+const gameItemsInterface = GameItems__factory.createInterface()
+const transferSingleTopic = gameItemsInterface.getEventTopic('TransferSingle')
+const tierUnlockedTopic = gameItemsInterface.getEventTopic('TierUnlocked')
 
 const battleContract = memoize((signer:Signer) => {
   const addr = addresses().Battle
@@ -32,9 +39,6 @@ export const useBattleContract = () => {
   }, [signer])
 }
 
-const battleInterface = Battle__factory.createInterface()
-const battleCompletedTopic = battleInterface.getEventTopic('BattleCompleted')
-
 const findBattleCompleted = (receipt:providers.TransactionReceipt) => {
   const evt = receipt.logs.find((log) => {
     return log.topics[0] === battleCompletedTopic
@@ -47,9 +51,6 @@ const findBattleCompleted = (receipt:providers.TransactionReceipt) => {
   return parsedEvt as unknown as  BattleCompletedEvent
 }
 
-const gameItemsInterface = GameItems__factory.createInterface()
-const transferSingleTopic = gameItemsInterface.getEventTopic('TransferSingle')
-
 const findMintedTokenEvents = (receipt:providers.TransactionReceipt) => {
   const evts = receipt.logs.filter((log) => {
     return log.topics[0] === transferSingleTopic
@@ -58,8 +59,20 @@ const findMintedTokenEvents = (receipt:providers.TransactionReceipt) => {
     throw new Error('bad transaction hash: missing topic')
   }
   const parsedEvts = evts.map((evt) => gameItemsInterface.parseLog(evt))
-  console.log('parsed events: ', parsedEvts)
+  console.log('parsed minted: ', parsedEvts)
   return parsedEvts as unknown as  TransferSingleEvent[]
+}
+
+const maybeFindTierUnlockEvent = (receipt:providers.TransactionReceipt) => {
+  const evt = receipt.logs.find((log) => {
+    return log.topics[0] === tierUnlockedTopic
+  })
+  if (!evt) {
+    return null
+  }
+  const parsedEvt = gameItemsInterface.parseLog(evt)
+  console.log('parsed unlock: ', parsedEvt)
+  return parsedEvt as unknown as TierUnlockedEvent
 }
 
 export const useBattleTransaction = (txHash?:string) => {
@@ -79,6 +92,8 @@ export const useBattleTransaction = (txHash?:string) => {
 
       const completedEvent = findBattleCompleted(receipt)
       const mintedTokenEvents = findMintedTokenEvents(receipt)
+      const tierUnlockedEvent = maybeFindTierUnlockEvent(receipt)
+
       const mintedTokens = mintedTokenEvents.map((evt) => {
         return allItems[evt.args.id.toNumber()]
       })
@@ -101,6 +116,7 @@ export const useBattleTransaction = (txHash?:string) => {
         winningItem: playerIsWinner ? myItem : opponentItem,
         losingItem: playerIsWinner ? opponentItem : myItem,
         mintedTokens,
+        tierUnlocked: tierUnlockedEvent,
       }
     },
     {
@@ -137,7 +153,7 @@ export const useOnBattleComplete = (onBattleComplete:TypedListener<BattleComplet
       wssBattle.off(p1Filter, onBattleComplete)
       wssBattle.off(p2Filter, onBattleComplete)
     }
-  }, [battle, address])
+  }, [battle, address, onBattleComplete, websocketProvider])
 }
 
 export const useDoBattle = () => {
