@@ -44,7 +44,7 @@ const findBattleCompleted = (receipt:providers.TransactionReceipt) => {
     return log.topics[0] === battleCompletedTopic
   })
   if (!evt) {
-    throw new Error('bad transaction hash: missing topic')
+    throw new Error('bad transaction hash: missing battle completed topic')
   }
   const parsedEvt = battleInterface.parseLog(evt)
   console.log('parsed event: ', parsedEvt)
@@ -52,12 +52,10 @@ const findBattleCompleted = (receipt:providers.TransactionReceipt) => {
 }
 
 const findMintedTokenEvents = (receipt:providers.TransactionReceipt) => {
+  console.log('evts: ', receipt.logs)
   const evts = receipt.logs.filter((log) => {
     return log.topics[0] === transferSingleTopic
   })
-  if (!evts || evts.length === 0) {
-    throw new Error('bad transaction hash: missing topic')
-  }
   const parsedEvts = evts.map((evt) => gameItemsInterface.parseLog(evt))
   console.log('parsed minted: ', parsedEvts)
   return parsedEvts as unknown as  TransferSingleEvent[]
