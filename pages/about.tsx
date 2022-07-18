@@ -27,7 +27,7 @@ const About:React.FC = () => {
         <Text>Pepper: <AppLink href="https://sketchfab.com/animator12">animator12</AppLink></Text>
         <Text>Polar Bear: <AppLink href="https://sketchfab.com/turunmuseokeskus">turunmuseokeskus</AppLink></Text>
       </VStack>
-      <PaddedQRCode value={`${window.location.protocol}//${window.location.host}${window.location.port ? `:${window.location.port}` : ''}}`} />
+      <PaddedQRCode value={`${window.location.protocol}//${window.location.host}${window.location.port ? `:${window.location.port}` : ''}`} />
     </Layout>
   )
 }
