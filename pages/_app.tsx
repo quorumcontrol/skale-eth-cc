@@ -19,13 +19,6 @@ import { ChakraProvider } from "@chakra-ui/react";
 import theme from '../src/utils/theme'
 import { torusWallet } from "../src/browserWallet/rainbowKitTorusWallet";
 
-
-const needsInjectedWalletFallback =
-  typeof window !== 'undefined' &&
-  window.ethereum &&
-  !window.ethereum.isMetaMask &&
-  !window.ethereum.isCoinbaseWallet;
-
 function getChain() {
   switch (activeChain) {
     case chainEnvs.local:
@@ -99,11 +92,13 @@ function MyApp({ Component, pageProps }: AppProps) {
                 key="ogsitename"
               />
               <link rel="icon" href="/favicon.ico" />
+              <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+              <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+              <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
               <meta
                 name="description"
-                content="Generate badges for the warriors attending your events."
+                content="Battle your new conference buddies, get all the items. Don't get rekt."
               />
-              <link rel="icon" href="/favicon.ico" />
               <meta
                 property="og:title"
                 content="Skale, Paper, Scissors"
