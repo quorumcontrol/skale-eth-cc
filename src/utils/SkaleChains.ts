@@ -3,7 +3,7 @@ import skaleLogo from '../assets/SKALE_logo.svg'
 
 export const skaleTestnet: Chain = {
   id: 132333505628089,
-  name: 'Skale Testnet',
+  name: 'SKALE Testnet',
   network: 'skaletestnet',
   iconUrl: skaleLogo.path,
   iconBackground: '#fff',

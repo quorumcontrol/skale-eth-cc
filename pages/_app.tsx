@@ -80,7 +80,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         >
           <ChakraProvider theme={theme}>
             <Head>
-              <title>Skale, Paper, Scissors</title>
+              <title>SKALE, Paper, Scissors</title>
               <meta
                 name="viewport"
                 content="width=device-width, initial-scale=1"
@@ -88,7 +88,7 @@ function MyApp({ Component, pageProps }: AppProps) {
               <meta charSet="utf-8" />
               <meta
                 property="og:site_name"
-                content="Skale, Paper, Scissors"
+                content="SKALE, Paper, Scissors"
                 key="ogsitename"
               />
               <link rel="icon" href="/favicon.ico" />
@@ -101,7 +101,7 @@ function MyApp({ Component, pageProps }: AppProps) {
               />
               <meta
                 property="og:title"
-                content="Skale, Paper, Scissors"
+                content="SKALE, Paper, Scissors"
                 key="ogtitle"
               />
               <meta
