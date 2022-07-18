@@ -88,11 +88,13 @@ export interface BattleInterface extends utils.Interface {
     "BattleCompleted(address,address,uint8,uint256,uint256)": EventFragment;
     "Cheater(address)": EventFragment;
     "Committed(address,bytes32,uint256)": EventFragment;
+    "SaltUsed(bytes32,bytes32)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "BattleCompleted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Cheater"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Committed"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "SaltUsed"): EventFragment;
 }
 
 export interface BattleCompletedEventObject {
@@ -127,6 +129,14 @@ export type CommittedEvent = TypedEvent<
 >;
 
 export type CommittedEventFilter = TypedEventFilter<CommittedEvent>;
+
+export interface SaltUsedEventObject {
+  playerOneSalt: string;
+  playerTwoSalt: string;
+}
+export type SaltUsedEvent = TypedEvent<[string, string], SaltUsedEventObject>;
+
+export type SaltUsedEventFilter = TypedEventFilter<SaltUsedEvent>;
 
 export interface Battle extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -267,6 +277,15 @@ export interface Battle extends BaseContract {
       commitment?: PromiseOrValue<BytesLike> | null,
       commitmentNumber?: null
     ): CommittedEventFilter;
+
+    "SaltUsed(bytes32,bytes32)"(
+      playerOneSalt?: PromiseOrValue<BytesLike> | null,
+      playerTwoSalt?: PromiseOrValue<BytesLike> | null
+    ): SaltUsedEventFilter;
+    SaltUsed(
+      playerOneSalt?: PromiseOrValue<BytesLike> | null,
+      playerTwoSalt?: PromiseOrValue<BytesLike> | null
+    ): SaltUsedEventFilter;
   };
 
   estimateGas: {
