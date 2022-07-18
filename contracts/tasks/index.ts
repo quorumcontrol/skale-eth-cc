@@ -42,6 +42,28 @@ task("make-minter")
     ).wait();
   });
 
+task("initialize-minter")
+  .addParam("address")
+  .setAction(async ({ address }, hre) => {
+    const gameItems = await getGameItemsContract(hre);
+    const minter = await gameItems.MINTER_ROLE();
+    let tx = await gameItems.grantRole(minter, address);
+    console.log("grant tx: ", tx.hash);
+    await tx.wait();
+    (
+      await hre.ethers.provider.getSigner().sendTransaction({
+        to: address,
+        value: utils.parseEther('200'),
+      })
+    ).wait();
+
+    tx = await gameItems.initialMint(address, {
+      value: utils.parseEther("1"),
+    });
+    console.log("initialize tx: ", tx.hash);
+    await tx.wait();
+  });
+
 task("make-full-admin")
   .addParam("address")
   .setAction(async ({ address }, hre) => {
