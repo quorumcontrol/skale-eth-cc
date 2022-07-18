@@ -58,7 +58,7 @@ export const useDoOnboard = () => {
     // gas ranges due to a loop, so giving a bunch of gas manually here
     // see https://whispering-turais.testnet-explorer.skalenodes.com/tx/0x9a89e86e271f02531b279559b966a76cd1124c634924b3934023e0b701032f73/token-transfers
     // for a working Tx
-    const tx = await gameItems.connect(signer).initialMint(address, { gasLimit: utils.parseUnits('300000', 'gwei'), value: utils.parseEther('0.5')})
+    const tx = await gameItems.connect(signer).initialMint(address, { gasLimit: 300000, value: utils.parseEther('0.5')})
     console.log('onboard tx: ', tx.hash)
     const receipt = await tx.wait()
     console.log('receipt')
