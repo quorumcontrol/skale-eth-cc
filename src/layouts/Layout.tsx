@@ -28,7 +28,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <LinkBox>
           <NextLink href="/" passHref>
             <LinkOverlay flexDir="row" display="flex" alignItems="center">
-              <Image src={logo.src} alt="Crypto Colosseum logo" width={['50px', '50px', '100px', '100px']} height={['50px', '50px', '100px', '100px']} />
+              <Image src={logo.src} alt="SKALE, Paper, Scissors logo" width={['50px', '50px', '100px', '100px']} height={['50px', '50px', '100px', '100px']} />
               <Heading size="sm" ml="5">
                 SKALE, Paper, Scissors
               </Heading>
