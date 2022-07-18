@@ -23,9 +23,11 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
     /// @notice Can Fire Initial Mint
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+    /// @notice Minter Role Apprentice
+    bytes32 public constant MINTER_APPRENTICE_ROLE = keccak256("MINTER_APPRENTICE_ROLE");
     /// @notice Can Mint on Wini
     bytes32 public constant WIN_MANAGER_ROLE = keccak256("WIN_MANAGER_ROLE");
-
+    
     /// @notice the contract that provides random numbers
     IDiceRoller immutable diceRoller;
 
@@ -81,6 +83,7 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, msg.sender);
         _setupRole(MINTER_ROLE, msg.sender);
+        _setRoleAdmin(MINTER_APPRENTICE_ROLE, MINTER_ROLE);
         diceRoller = IDiceRoller(diceRollerContract);
         numberItems = 0;
         numberPlayers = 0;
@@ -94,7 +97,7 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
 
     /// @notice Only Minter -> Calls Initial Mint
     modifier onlyMinter() {
-        require(hasRole(MINTER_ROLE, msg.sender), ACCESS_DENIED);
+        require(hasRole(MINTER_ROLE, msg.sender) || hasRole(MINTER_APPRENTICE_ROLE, msg.sender), ACCESS_DENIED);
         _;
     }
 
@@ -240,25 +243,32 @@ contract GameItems is AccessControlEnumerable, ERC1155URIStorage, IGameItems {
     /// @param receiever the user that wins
     /// @param tokenId The tokenId to be minted
     function winBattle(address receiever, uint256 tokenId) override external onlyWinManager {
-        /// Run Internal Mint for the Winner
-        _internalMint(receiever, tokenId);
         /// Check The Tier of the Winner Item
         uint8 tier = metadata[tokenId].tier;
-        if ((tier == 0 || tier == 1) && _checkTier(receiever, tier) && !_tierUnlocked(receiever, tier + 1)) {
+        bool _hasTokenInTier = _checkTier(receiever, tier);
+        /// Run Internal Mint for the Winner
+        _internalMint(receiever, tokenId);
+        
+        if (!_hasTokenInTier && tier != 2) {
+            _unlockTier(receiever,  tier);
+            emit TierUnlocked(receiever, tokenId, tier);
+        } else if ((tier == 0 || tier == 1) && _checkTier(receiever, tier) && !_tierUnlocked(receiever, tier + 1)) {
             uint256 nextTierTokenId = _randomTokenId(tier + 1);
             _internalMint(receiever, nextTierTokenId);
             _unlockTier(receiever,  tier + 1);
             emit TierUnlocked(receiever, nextTierTokenId, tier + 1);
         }
 
-        /// Else if Tier 3 Check For Winner
         if (tier == 2 && !_tierUnlocked(receiever, 3)) {
             bool _isWinner = _checkWinner(receiever);
             if (_isWinner) {
                 _unlockTier(receiever, 3);
                 emit Winner(receiever);
             }
-        }
+        } 
+
+        /// Else if Tier 3 Check For Winner
+        
     }
 
     /// @dev Checks if a player is a winner

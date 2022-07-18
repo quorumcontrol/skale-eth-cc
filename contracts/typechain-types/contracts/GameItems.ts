@@ -59,6 +59,7 @@ export interface GameItemsInterface extends utils.Interface {
   functions: {
     "ADMIN_ROLE()": FunctionFragment;
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
+    "MINTER_APPRENTICE_ROLE()": FunctionFragment;
     "MINTER_ROLE()": FunctionFragment;
     "WIN_MANAGER_ROLE()": FunctionFragment;
     "addItem(uint8,string,string,string,string,uint256[],string)": FunctionFragment;
@@ -92,6 +93,7 @@ export interface GameItemsInterface extends utils.Interface {
     nameOrSignatureOrTopic:
       | "ADMIN_ROLE"
       | "DEFAULT_ADMIN_ROLE"
+      | "MINTER_APPRENTICE_ROLE"
       | "MINTER_ROLE"
       | "WIN_MANAGER_ROLE"
       | "addItem"
@@ -127,6 +129,10 @@ export interface GameItemsInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "DEFAULT_ADMIN_ROLE",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "MINTER_APPRENTICE_ROLE",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -255,6 +261,10 @@ export interface GameItemsInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "ADMIN_ROLE", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "DEFAULT_ADMIN_ROLE",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "MINTER_APPRENTICE_ROLE",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -516,6 +526,8 @@ export interface GameItems extends BaseContract {
 
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
+    MINTER_APPRENTICE_ROLE(overrides?: CallOverrides): Promise<[string]>;
+
     MINTER_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
     WIN_MANAGER_ROLE(overrides?: CallOverrides): Promise<[string]>;
@@ -659,6 +671,8 @@ export interface GameItems extends BaseContract {
 
   DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
+  MINTER_APPRENTICE_ROLE(overrides?: CallOverrides): Promise<string>;
+
   MINTER_ROLE(overrides?: CallOverrides): Promise<string>;
 
   WIN_MANAGER_ROLE(overrides?: CallOverrides): Promise<string>;
@@ -801,6 +815,8 @@ export interface GameItems extends BaseContract {
     ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
+
+    MINTER_APPRENTICE_ROLE(overrides?: CallOverrides): Promise<string>;
 
     MINTER_ROLE(overrides?: CallOverrides): Promise<string>;
 
@@ -1070,6 +1086,8 @@ export interface GameItems extends BaseContract {
 
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
+    MINTER_APPRENTICE_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
+
     MINTER_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
     WIN_MANAGER_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1213,6 +1231,10 @@ export interface GameItems extends BaseContract {
     ADMIN_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     DEFAULT_ADMIN_ROLE(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    MINTER_APPRENTICE_ROLE(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
