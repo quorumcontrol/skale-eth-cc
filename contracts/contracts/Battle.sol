@@ -43,7 +43,7 @@ contract Battle {
     /// @notice Commit Already Exists Error
     string private constant COMMIT_ALREADY_EXISTS = "Commit Already Exists";
     /// @notice Commit Emtpy Cannot Battle
-    string private constant CANNOT_BATTLE = "Comimt Empty: Battle Impossible";
+    string private constant CANNOT_BATTLE = "Commit Empty: Battle Impossible";
 
     ////////////////////////////////////////
     //////////////// Events ////////////////

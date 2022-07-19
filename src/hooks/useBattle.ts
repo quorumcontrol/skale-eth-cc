@@ -161,8 +161,10 @@ export const useOnBattleComplete = (onBattleComplete:TypedListener<BattleComplet
 }
 
 export const useDoBattle = () => {
+  const { address } = useAccount()
   const { data:commitment } = useCommitment()
   const battleContract = useBattleContract()
+  const queryClient = useQueryClient()
 
   return useMutation(async (info:BattleInfo) => {
     if (!commitment || !commitment.isCommitted || !battleContract) {
@@ -175,6 +177,10 @@ export const useDoBattle = () => {
     console.log('battle tx: ', tx.hash)
     const receipt = await tx.wait()
     return receipt
+  }, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(['commitment', address], { refetchInactive: true })
+    }
   })
 }
 
@@ -202,7 +208,9 @@ export const useCommitment = () => {
     if (!battleContract || !address) {
       throw new Error('something weird happened, missing things required by enable')
     }
-    const isCommitted = (await battleContract.getCommitment(address)) !== constants.HashZero
+    const commitment = await battleContract.getCommitment(address)
+    console.log("commitment fetched: ", commitment)
+    const isCommitted = (commitment !== constants.HashZero)
     const storedSalt = localStorage.getItem(LOCAL_STORAGE_SALT_KEY)
     const storedTokenId = localStorage.getItem(LOCAL_STORAGE_TOKEN_KEY)
     return {
@@ -226,12 +234,13 @@ export const useDoCommit = () => {
     }
 
     const salt = randomBytes(32)
-    localStorage.setItem(LOCAL_STORAGE_SALT_KEY, salt.toString('hex'))
-    localStorage.setItem(LOCAL_STORAGE_TOKEN_KEY, tokenId.toString(10))
     const commit = solidityKeccak256(['bytes32', 'uint256'], [salt, BigNumber.from(tokenId)])
     console.log('committing: ', commit, salt, tokenId)
     const tx = await battleContract.commitItem(commit)
-    return tx.wait()
+    const receipt = await tx.wait()
+    localStorage.setItem(LOCAL_STORAGE_SALT_KEY, salt.toString('hex'))
+    localStorage.setItem(LOCAL_STORAGE_TOKEN_KEY, tokenId.toString(10))
+    return receipt
   }, {
     onSuccess: () => {
       client.invalidateQueries([['commitment', address]], {
