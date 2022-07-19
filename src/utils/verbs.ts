@@ -1,3 +1,4 @@
+import { BigNumber, BytesLike } from "ethers";
 
 
 export const playOffVerbs = [
@@ -8,8 +9,9 @@ export const playOffVerbs = [
   'three legged race'
 ]
 
-export function randomPlayoffVerb() {
-  return playOffVerbs[Math.floor(Math.random()*playOffVerbs.length)];
+export function playoffVerbForTx(txHash:BytesLike) {
+  const num = BigNumber.from(txHash).mod(playOffVerbs.length).toNumber()
+  return playOffVerbs[num];
 }
 
 export const verbs:Record<number, Record<number, string>> = {

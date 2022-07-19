@@ -6,7 +6,7 @@ import { useBattleTransaction } from "../../src/hooks/useBattle";
 import { InventoryItem } from "../../src/hooks/useGameItems";
 import useIsClientSide from "../../src/hooks/useIsClientSide";
 import Layout from "../../src/layouts/Layout";
-import { verbs, randomPlayoffVerb } from "../../src/utils/verbs";
+import { verbs, playoffVerbForTx } from "../../src/utils/verbs";
 
 const CollectedItems: React.FC<{ items: InventoryItem[] }> = ({ items }) => {
   if (items.length === 1) {
@@ -64,7 +64,7 @@ const BattleComplete: React.FC = () => {
       )}
       {!data.draw && !verb && (
         <Text>
-          {data.winningItem.metadata.name} beat {data.losingItem.metadata.name} in a <Verb>{randomPlayoffVerb()}</Verb>
+          {data.winningItem.metadata.name} beat {data.losingItem.metadata.name} in a <Verb>{playoffVerbForTx(txHash as string)}</Verb>
         </Text>
       )}
       {data.playerIsWinner && <CollectedItems items={data.mintedTokens} />}
