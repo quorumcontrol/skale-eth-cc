@@ -15,7 +15,6 @@ export default function Inventory() {
   const {
     data: commitment,
     isFetching: commitmentFetching,
-    isIdle,
   } = useCommitment();
   const commit = useDoCommit();
   const router = useRouter();
@@ -23,18 +22,18 @@ export default function Inventory() {
   const onChoose = async (tokenId: number) => {
     setLoading(true);
     try {
-      const receipt = await commit.mutateAsync(tokenId);
+      const { receipt, salt } = await commit.mutateAsync(tokenId);
       console.log("commit receipt: ", receipt);
-      await router.push("/battle");
+      await router.push(`/battle/${salt}`);
     } finally {
       setLoading(false);
     }
   };
 
   const allowItemChoice =
-    !isIdle && !commitmentFetching && commitment && !commitment.isCommitted;
+    !commitmentFetching && commitment && !commitment.isCommitted;
 
-  if (isIdle || !isClient || loading || isFetching || commitmentFetching) {
+  if (!isClient || loading || isFetching || commitmentFetching) {
     return (
       <Layout>
         <Spinner />
@@ -46,10 +45,10 @@ export default function Inventory() {
     <Layout>
       <Heading>Inventory</Heading>
       <Text>Choose the item to play against your opponent.</Text>
-      {!isIdle && !commitmentFetching && commitment && commitment.isCommitted && (
+      {!commitmentFetching && commitment && commitment.isCommitted && (
         <>
           <Text>You already have an item chosen.</Text>
-          <NextLink href="/battle">
+          <NextLink href={`/battle/${commitment.salt}`}>
             <Button>Battle</Button>
           </NextLink>
         </>

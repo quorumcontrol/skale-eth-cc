@@ -8,7 +8,7 @@ import { useQuery, useMutation, useQueryClient } from 'react-query'
 import { randomBytes } from "crypto"
 import { BytesLike, defaultAbiCoder, solidityKeccak256 } from "ethers/lib/utils"
 import {  TypedListener } from "../../contracts/typechain-types/common"
-import { BattleCompletedEvent } from "../../contracts/typechain-types/contracts/Battle"
+import { BattleCompletedEvent, SaltUsedEvent } from "../../contracts/typechain-types/contracts/Battle"
 import useWebsocketProvider from "./useWebsocketProvider"
 import { useAllItems } from "./useGameItems"
 import { TierUnlockedEvent, TransferSingleEvent } from "../../contracts/typechain-types/contracts/GameItems"
@@ -123,41 +123,69 @@ export const useBattleTransaction = (txHash?:string) => {
   )
 }
 
+export const useSaltTransactionFinder = (salt?:BytesLike) => {
+  const battleContract = useBattleContract()
+
+  return useQuery(
+    ['battle-transaction-finder', salt],
+    async () => {
+      if (!battleContract || !salt) {
+        console.log('missing requirements', battleContract, salt)
+        return
+      }
+      const filterOne = battleContract?.filters.SaltUsed(null, salt)
+      const filterTwo = battleContract?.filters.SaltUsed(salt, null)
+      const evts = await battleContract.queryFilter(filterOne)
+      if (evts.length > 0) {
+        return evts[0].transactionHash
+      }
+
+      const evts2 = await battleContract.queryFilter(filterTwo)
+      if (evts2.length > 0) {
+        return evts2[0].transactionHash
+      }
+
+      return null
+    }, {
+      refetchInterval: 2000,
+      enabled: !!battleContract && !!salt,
+    }
+  )
+}
+
 export interface BattleInfo {
   opponentAddr:string
   opponentSalt:BytesLike
   opponentTokenid:BigNumber
 }
 
-export const useOnBattleComplete = (onBattleComplete:TypedListener<BattleCompletedEvent>) => {
+export const useOnBattleComplete = (salt:BytesLike|undefined, onBattleComplete:TypedListener<SaltUsedEvent>) => {
   const battle = useBattleContract()
-  const websocketProvider = useWebsocketProvider()
-  const { address } = useAccount()
 
   useEffect(() => {
-    if (!battle || !address) {
+    if (!battle || !salt) {
       return
     }
 
-    const handler:TypedListener<BattleCompletedEvent> = (...args) => {
+    const handler:TypedListener<SaltUsedEvent> = (...args) => {
       onBattleComplete(...args)
     }
 
     // const wssBattle = battle.connect(websocketProvider)
     const wssBattle = battle // TODO: testing to see if using a non-websocket helps this.
 
-    console.log('subscribing to battleCompleted: ', address)
-    const p1Filter = wssBattle.filters.BattleCompleted(address, null, null, null, null)
-    const p2Filter = wssBattle.filters.BattleCompleted(null, address, null, null, null)
+    console.log('subscribing to saltUsed: ', salt)
+    const p1Filter = wssBattle.filters.SaltUsed(null, salt)
+    const p2Filter = wssBattle.filters.SaltUsed(salt, null)
 
     wssBattle.on(p1Filter, handler)
     wssBattle.on(p2Filter, handler)
     return () => {
-      console.log('unsubscribing from battle completed')
+      console.log('unsubscribing from salt used')
       wssBattle.off(p1Filter, handler)
       wssBattle.off(p2Filter, handler)
     }
-  }, [battle, address, onBattleComplete, websocketProvider])
+  }, [battle, onBattleComplete, salt])
 }
 
 export const useDoBattle = () => {
@@ -165,6 +193,8 @@ export const useDoBattle = () => {
   const { data:commitment } = useCommitment()
   const battleContract = useBattleContract()
   const queryClient = useQueryClient()
+
+  const commitmentKey = ['commitment', address]
 
   return useMutation(async (info:BattleInfo) => {
     if (!commitment || !commitment.isCommitted || !battleContract) {
@@ -176,11 +206,13 @@ export const useDoBattle = () => {
     const tx = await battleContract.battle(info.opponentAddr, info.opponentSalt, info.opponentTokenid, commitment.salt!, commitment.tokenId!)
     console.log('battle tx: ', tx.hash)
     const receipt = await tx.wait()
+    queryClient.cancelQueries(commitmentKey)
+    queryClient.setQueryData(commitmentKey, {
+      isCommitted: false,
+      salt: undefined,
+      tokenId: undefined,
+    })
     return receipt
-  }, {
-    onSuccess: () => {
-      queryClient.invalidateQueries(['commitment', address], { refetchInactive: true })
-    }
   })
 }
 
@@ -215,7 +247,7 @@ export const useCommitment = () => {
     const storedTokenId = localStorage.getItem(LOCAL_STORAGE_TOKEN_KEY)
     return {
       isCommitted,
-      salt: storedSalt ? Buffer.from(storedSalt, 'hex') : undefined,
+      salt: storedSalt ? `0x${storedSalt}` : undefined,
       tokenId: storedTokenId ? parseInt(storedTokenId, 10) : undefined
     }
   }, {
@@ -227,6 +259,8 @@ export const useDoCommit = () => {
   const { address } = useAccount()
   const battleContract = useBattleContract()
   const client = useQueryClient()
+
+  const commitmentKey = ['commitment', address]
 
   return useMutation(async (tokenId:number) => {
     if (!battleContract) {
@@ -240,12 +274,16 @@ export const useDoCommit = () => {
     const receipt = await tx.wait()
     localStorage.setItem(LOCAL_STORAGE_SALT_KEY, salt.toString('hex'))
     localStorage.setItem(LOCAL_STORAGE_TOKEN_KEY, tokenId.toString(10))
-    return receipt
-  }, {
-    onSuccess: () => {
-      client.invalidateQueries([['commitment', address]], {
-        refetchInactive: true,
-      })
+    client.cancelQueries(commitmentKey)
+    client.setQueriesData(commitmentKey, {
+      isCommitted: true,
+      salt: `0x${salt.toString('hex')}`,
+      tokenId,
+    })
+    return {
+      receipt,
+      salt: `0x${salt.toString('hex')}`,
+      tokenId,
     }
   })
 }
