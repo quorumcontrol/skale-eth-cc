@@ -30,6 +30,7 @@ export class Eip1193Bridge extends EventEmitter {
      }
 
      async send(method: string, params?: Array<any>): Promise<any> {
+        console.log("send: ", method, params)
          function throwUnsupported(message: string): never {
              return logger.throwError(message, ethers.utils.Logger.errors.UNSUPPORTED_OPERATION, {
                  method: method,
@@ -84,15 +85,15 @@ export class Eip1193Bridge extends EventEmitter {
              }
              case "eth_call": {
                  console.log('eth_call', method, params)
-                 const req = ethers.providers.JsonRpcProvider.hexlifyTransaction(params[0]);
-                 return await this.provider.call(req, params[1]);
+                //  const req = ethers.providers.JsonRpcProvider.hexlifyTransaction(params[0]);
+                 return await this.provider.call(params[0], params[1]);
              }
              case "estimateGas": {
                  if (params[1] && params[1] !== "latest") {
                      throwUnsupported("estimateGas does not support blockTag");
                  }
 
-                 const req = ethers.providers.JsonRpcProvider.hexlifyTransaction(params[0]);
+                //  const req = ethers.providers.JsonRpcProvider.hexlifyTransaction(params[0]);
                  const result = await this.provider.estimateGas(req);
                  return result.toHexString();
              }
@@ -131,10 +132,12 @@ export class Eip1193Bridge extends EventEmitter {
                      return throwUnsupported("eth_sendTransaction requires an account");
                  }
 
-                 const req = ethers.providers.JsonRpcProvider.hexlifyTransaction(params[0]);
+                //  const req = ethers.providers.JsonRpcProvider.hexlifyTransaction(params[0]);
 
-                 console.log('req: ', req)
-                 const tx = await this.signer.sendTransaction(req);
+                 console.log('sendTransaction: ', params)
+                 const {gas, ...txReq} = params[0]
+
+                 const tx = await this.signer.sendTransaction(txReq);
                  return tx.hash;
              }
 
