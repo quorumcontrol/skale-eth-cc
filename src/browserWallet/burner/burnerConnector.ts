@@ -1,7 +1,6 @@
-import { ethers, providers, Signer } from 'ethers'
+import { ethers, providers } from 'ethers'
 import {
   Chain,
-  ConnectorNotFoundError,
   ResourceUnavailableError,
   RpcError,
   UserRejectedRequestError,
@@ -95,6 +94,6 @@ export class BurnerConnector extends InjectedConnector {
   }
 
   async getProvider() {
-   return this.provider as Ethereum
+   return this.provider as any // used to be type Ethereum but that doesn't export for some reason anymore
   }
 }
