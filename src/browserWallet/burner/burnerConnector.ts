@@ -1,7 +1,6 @@
-import { ethers } from 'ethers'
+import { ethers, providers } from 'ethers'
 import {
   Chain,
-  ConnectorNotFoundError,
   ResourceUnavailableError,
   RpcError,
   UserRejectedRequestError,
@@ -9,7 +8,7 @@ import {
 import {
   InjectedConnector,
 } from 'wagmi/connectors/injected'
-import { getTorus, torus } from './torus'
+import { getAuth } from './burnerAuth'
 
 type InjectedConnectorOptions = {
   name?: string | ((detectedName: string | string[]) => string)
@@ -24,11 +23,12 @@ export type MetaMaskConnectorOptions = Pick<
   UNSTABLE_shimOnConnectSelectAccount?: boolean
 }
 
-export class TorusConnector extends InjectedConnector {
-  readonly id = 'torus'
+export class BurnerConnector extends InjectedConnector {
+  readonly id = 'burner-wallet'
   readonly ready = true
 
   provider?: ethers.providers.ExternalProvider
+  signer?: ethers.Signer
 
   constructor({
     chains,
@@ -51,18 +51,10 @@ export class TorusConnector extends InjectedConnector {
 
   async connect({ chainId }: { chainId?: number } = {}) {
     try {      
-      const provider = await this.getProvider()
-      if (!provider) throw new ConnectorNotFoundError()
-      await new Promise((resolve) => {
-        const promise = torus.login()
-        // this is super hacky, but the rainbow kit modal appears *in front of* the iframe without adjusting the zIndex
-        // change. So, this is a hack, to make it appear more normal to the user.
-        setTimeout(() => {
-          document.getElementById('torusIframe')!.style.zIndex = '2147483647'
-          console.log('z index: ', document.getElementById('torusIframe')!.style.zIndex)
-        }, 100)
-        resolve(promise)
-      })
+      
+      const { provider, signer } = await getAuth()
+      this.provider = provider as unknown as providers.ExternalProvider
+      this.signer = signer
 
       if (provider.on) {
         provider.on('accountsChanged', this.onAccountsChanged)
@@ -82,7 +74,7 @@ export class TorusConnector extends InjectedConnector {
         unsupported = this.isChainUnsupported(id)
       }
 
-      return { account, chain: { id, unsupported }, provider }
+      return { account, chain: { id, unsupported }, provider: (provider as any) }
     } catch (error) {
       if (this.isUserRejectedRequestError(error))
         throw new UserRejectedRequestError(error)
@@ -92,8 +84,16 @@ export class TorusConnector extends InjectedConnector {
     }
   }
 
+  async getAccount(): Promise<string> {
+    if (!this.signer) {
+      throw new Error('no signer')
+    }
+    const address = await this.signer.getAddress()
+    console.log('get ccount: ', address)
+    return address
+  }
+
   async getProvider() {
-   this.provider = (await getTorus()).provider
-   return this.provider as any
+   return this.provider as any // used to be type Ethereum but that doesn't export for some reason anymore
   }
 }

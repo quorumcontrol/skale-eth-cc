@@ -18,6 +18,7 @@ import "@fontsource/dm-sans";
 import { ChakraProvider } from "@chakra-ui/react";
 import theme from '../src/utils/theme'
 import { torusWallet } from "../src/browserWallet/rainbowKitTorusWallet";
+import { burnerAuthWallet } from "../src/browserWallet/burner/rainbowKitBurner";
 
 const { chains, provider } = configureChains([defaultNetwork()], [
   jsonRpcProvider({
@@ -40,10 +41,15 @@ const connectors = connectorsForWallets([
   {
     groupName: 'Recommended',
     wallets: [
+      burnerAuthWallet({ chains })
+    ],
+  },
+  {
+    groupName: 'Supported',
+    wallets: [
       wallet.metaMask({ chains }),
       wallet.coinbase({ chains, appName: 'Skale, Paper, Scissors' }),
       wallet.walletConnect({ chains }),
-      torusWallet({ chains }),
     ],
   },
 ]);

@@ -1,7 +1,14 @@
 import "@nomiclabs/hardhat-ethers";
 import { utils } from "ethers";
 import { task } from "hardhat/config";
-import { getGameItemsContract } from "./helpers";
+import { getBatleContract, getGameItemsContract } from "./helpers";
+
+task('players')
+  .setAction(async (_, hre) => {
+    const gameItems = await getGameItemsContract(hre);
+    const num = await gameItems.getNumberPlayers()
+    console.log(num.toNumber())
+  })
 
 task("setup-user")
   .addParam("address")
