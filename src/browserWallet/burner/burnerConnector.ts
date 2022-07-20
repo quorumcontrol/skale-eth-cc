@@ -85,16 +85,6 @@ export class BurnerConnector extends InjectedConnector {
     }
   }
 
-  // async getSigner(): Promise<ethers.providers.JsonRpcSigner> {
-  //   if (!this.provider || !this.signer) {
-  //     throw new Error('no signer')
-  //   }
-  //   // const signer = new ethers.providers.Web3Provider(this.provider).getSigner()
-  //   console.log('get signer', this.signer, await this.signer.getAddress())
-
-  //   return this.signer as unknown as providers.JsonRpcSigner
-  // }
-
   async getAccount(): Promise<string> {
     if (!this.signer) {
       throw new Error('no signer')
