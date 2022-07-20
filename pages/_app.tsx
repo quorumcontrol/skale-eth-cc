@@ -44,14 +44,14 @@ const connectors = connectorsForWallets([
       burnerAuthWallet({ chains })
     ],
   },
-  // {
-  //   groupName: 'Supported',
-  //   wallets: [
-  //     wallet.metaMask({ chains }),
-  //     wallet.coinbase({ chains, appName: 'Skale, Paper, Scissors' }),
-  //     wallet.walletConnect({ chains }),
-  //   ],
-  // },
+  {
+    groupName: 'Supported',
+    wallets: [
+      wallet.metaMask({ chains }),
+      wallet.coinbase({ chains, appName: 'Skale, Paper, Scissors' }),
+      wallet.walletConnect({ chains }),
+    ],
+  },
 ]);
 
 const wagmiClient = createClient({
