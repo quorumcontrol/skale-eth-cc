@@ -5,6 +5,7 @@ import { useMutation, useQuery } from 'react-query'
 import { GameItems__factory } from "../../contracts/typechain-types"
 import { memoize } from "../utils/memoize"
 import { addresses } from "../utils/networkSelector"
+import addressExists from "../utils/addressExists"
 
 const gameItemsContract = memoize((provider:providers.Provider) => {
   const addr = addresses().GameItems
@@ -80,7 +81,7 @@ export const useCanOnboard = () => {
     return hasRole
   },
   {
-    enabled: !!address
+    enabled: addressExists(address)
   })
 }
 
@@ -126,7 +127,7 @@ export const useInventory = () => {
     })
     return items.filter((item) => item.metadata.name !== '')
   }, {
-    enabled: !!address
+    enabled: addressExists(address)
   })
 }
 

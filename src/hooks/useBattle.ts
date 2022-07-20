@@ -12,6 +12,7 @@ import { BattleCompletedEvent, SaltUsedEvent } from "../../contracts/typechain-t
 import useWebsocketProvider from "./useWebsocketProvider"
 import { useAllItems } from "./useGameItems"
 import { TierUnlockedEvent, TransferSingleEvent } from "../../contracts/typechain-types/contracts/GameItems"
+import addressExists from "../utils/addressExists"
 
 const LOCAL_STORAGE_SALT_KEY = 'bps:salt'
 const LOCAL_STORAGE_TOKEN_KEY = 'bps:tokenId'
@@ -118,7 +119,7 @@ export const useBattleTransaction = (txHash?:string) => {
       }
     },
     {
-      enabled: !!txHash && !!address && !!allItems
+      enabled: !!txHash && addressExists(address) && !!allItems
     }
   )
 }
@@ -233,13 +234,14 @@ export const useEncodedCommitmentData = () => {
 }
 
 export const useCommitment = () => {
-  const { address } = useAccount()
+  const { address, isConnected } = useAccount()
   const battleContract = useBattleContract()
 
   return useQuery(['commitment', address], async () => {
     if (!battleContract || !address) {
       throw new Error('something weird happened, missing things required by enable')
     }
+    console.log('address in get commitment: ', address)
     const commitment = await battleContract.getCommitment(address)
     console.log("commitment fetched: ", commitment)
     const isCommitted = (commitment !== constants.HashZero)
@@ -251,7 +253,7 @@ export const useCommitment = () => {
       tokenId: storedTokenId ? parseInt(storedTokenId, 10) : undefined
     }
   }, {
-    enabled: !!address && !!battleContract
+    enabled: isConnected && addressExists(address) && !!battleContract
   })
 }
 
