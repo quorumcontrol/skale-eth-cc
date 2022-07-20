@@ -74,7 +74,7 @@ export class BurnerConnector extends InjectedConnector {
         unsupported = this.isChainUnsupported(id)
       }
 
-      return { account, chain: { id, unsupported }, provider: (provider as unknown as Ethereum) }
+      return { account, chain: { id, unsupported }, provider: (provider as any) }
     } catch (error) {
       if (this.isUserRejectedRequestError(error))
         throw new UserRejectedRequestError(error)

@@ -94,6 +94,6 @@ export class TorusConnector extends InjectedConnector {
 
   async getProvider() {
    this.provider = (await getTorus()).provider
-   return this.provider as Ethereum
+   return this.provider as any
   }
 }
