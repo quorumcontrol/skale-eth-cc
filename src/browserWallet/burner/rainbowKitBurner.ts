@@ -20,12 +20,6 @@ export const burnerAuthWallet = ({ chains }: any): Wallet => ({
     return {
       connector,
       installed: true,
-      mobile: {
-        getUri: async () => {
-          // const { uri } = (await connector.getProvider()).connector;
-          return chain.rpcUrls.default
-        },
-      },
     };
   },
 });
