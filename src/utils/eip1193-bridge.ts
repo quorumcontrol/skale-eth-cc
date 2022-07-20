@@ -21,6 +21,8 @@ export class Eip1193Bridge extends EventEmitter {
 
      constructor(signer: ethers.Signer, provider: ethers.providers.Provider) {
          super();
+         this.signer = signer
+         this.provider = provider
          ethers.utils.defineReadOnly(this, "signer", signer);
          ethers.utils.defineReadOnly(this, "provider", provider);
      }
@@ -29,7 +31,7 @@ export class Eip1193Bridge extends EventEmitter {
          return this.send(request.method, request.params || []);
      }
 
-     async send(method: string, params?: Array<any>): Promise<any> {
+     async send(method: string, params: Array<any>): Promise<any> {
         console.log("send: ", method, params)
          function throwUnsupported(message: string): never {
              return logger.throwError(message, ethers.utils.Logger.errors.UNSUPPORTED_OPERATION, {
@@ -94,7 +96,7 @@ export class Eip1193Bridge extends EventEmitter {
                  }
 
                 //  const req = ethers.providers.JsonRpcProvider.hexlifyTransaction(params[0]);
-                 const result = await this.provider.estimateGas(req);
+                 const result = await this.provider.estimateGas(params[0]);
                  return result.toHexString();
              }
 
