@@ -13,6 +13,7 @@ import useWebsocketProvider from "./useWebsocketProvider"
 import { useAllItems } from "./useGameItems"
 import { TierUnlockedEvent, TransferSingleEvent } from "../../contracts/typechain-types/contracts/GameItems"
 import addressExists from "../utils/addressExists"
+import { token } from "../../contracts/typechain-types/@openzeppelin/contracts"
 
 const LOCAL_STORAGE_SALT_KEY = 'bps:salt'
 const LOCAL_STORAGE_TOKEN_KEY = 'bps:tokenId'
@@ -218,10 +219,13 @@ export const useDoBattle = () => {
   })
 }
 
-export const useEncodedCommitmentData = (_transactionHash:string, tokenId:number, salt:BytesLike) => {
+export const useEncodedCommitmentData = (_transactionHash?:string, tokenId?:number, salt?:BytesLike) => {
   const { address } = useAccount()
 
   return useMemo(() => {
+    if (!tokenId || !salt) {
+      return ''
+    }
     const encoded = defaultAbiCoder.encode(
       ['address', 'bytes32', 'uint256'],
       [address, salt, BigNumber.from(tokenId)])
