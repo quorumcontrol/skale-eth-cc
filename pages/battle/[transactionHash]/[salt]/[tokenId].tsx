@@ -7,18 +7,18 @@ import {
   useEncodedCommitmentData,
   useOnBattleComplete,
   useSaltTransactionFinder,
-} from "../../src/hooks/useBattle";
-import useIsClientSide from "../../src/hooks/useIsClientSide";
-import Layout from "../../src/layouts/Layout";
-import AppLink from "../../src/components/AppLink";
-import PaddedQRCode from "../../src/components/PaddedQRCode";
+} from "../../../../src/hooks/useBattle";
+import useIsClientSide from "../../../../src/hooks/useIsClientSide";
+import Layout from "../../../../src/layouts/Layout";
+import AppLink from "../../../../src/components/AppLink";
+import PaddedQRCode from "../../../../src/components/PaddedQRCode";
 
 
 export default function Battle() {
   const router = useRouter()
-  const { salt } = router.query
-  const { data: commitment, isFetching } = useCommitment();
-  const qrData = useEncodedCommitmentData();
+  const { salt, transactionHash, tokenId } = router.query
+  // const { data: commitment, isFetching } = useCommitment();
+  const qrData = useEncodedCommitmentData(transactionHash as string, parseInt(tokenId as string, 10), salt as string);
   const isClient = useIsClientSide();
 
   const { data:saltTx } = useSaltTransactionFinder(salt as string)
@@ -38,13 +38,13 @@ export default function Battle() {
     );
   }
 
-  if (isFetching) {
-    return (
-      <Layout>
-        <Spinner />
-      </Layout>
-    );
-  }
+  // if (isFetching) {
+  //   return (
+  //     <Layout>
+  //       <Spinner />
+  //     </Layout>
+  //   );
+  // }
 
   if (saltTx) {
     return (
@@ -55,15 +55,6 @@ export default function Battle() {
         </NextLink>
       </Layout>
     )
-  }
-
-  if (!commitment || (!commitment.isCommitted && !commitment.transactionHash)) {
-    return (
-      <Layout>
-        <Text>Looks like you haven&apos;t chosen an item yet.</Text>
-        <AppLink href="/inventory">Go back to inventory.</AppLink>
-      </Layout>
-    );
   }
 
   return (

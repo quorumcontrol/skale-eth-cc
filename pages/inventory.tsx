@@ -22,8 +22,8 @@ export default function Inventory() {
   const onChoose = async (tokenId: number) => {
     setLoading(true);
     try {
-      const { salt } = await commit.mutateAsync(tokenId);
-      await router.push(`/battle/${salt}`);
+      const { salt, transactionHash } = await commit.mutateAsync(tokenId);
+      await router.push(`/battle/${transactionHash}/${salt}/${tokenId}`);
     } finally {
       setLoading(false);
     }

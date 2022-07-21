@@ -217,27 +217,22 @@ export const useDoBattle = () => {
   })
 }
 
-export const useEncodedCommitmentData = () => {
+export const useEncodedCommitmentData = (_transactionHash:string, tokenId:number, salt:BytesLike) => {
   const { address } = useAccount()
-  const { data:commitment } = useCommitment()
 
   return useMemo(() => {
-    if (!address || !commitment || !commitment.isCommitted) {
-      return undefined
-    }
     const encoded = defaultAbiCoder.encode(
-      ['address', 'bytes32', 'uint256', 'string'],
-      [address, commitment.salt, BigNumber.from(commitment.tokenId), commitment.transactionHash || ""])
-    console.log('encoded', encoded, address, commitment.salt, commitment.tokenId)
+      ['address', 'bytes32', 'uint256'],
+      [address, salt, BigNumber.from(tokenId)])
+    console.log('encoded', encoded, address, salt, tokenId)
     return encoded
-  }, [commitment, address])
+  }, [tokenId, salt, address])
 }
 
 export interface CommitmentData {
   isCommitted: boolean
   salt?: BytesLike
   tokenId? : number
-  transactionHash?: string
 }
 
 export const useCommitment = () => {
@@ -258,7 +253,6 @@ export const useCommitment = () => {
       isCommitted,
       salt: storedSalt ? `0x${storedSalt}` : undefined,
       tokenId: storedTokenId ? parseInt(storedTokenId, 10) : undefined,
-      transactionHash: undefined
     } as CommitmentData
   }, {
     enabled: isConnected && addressExists(address) && !!battleContract
@@ -292,7 +286,6 @@ export const useDoCommit = () => {
       isCommitted: true,
       salt: `0x${salt.toString('hex')}`,
       tokenId,
-      transactionHash: transaction.hash,
     })
     return {
       transactionHash: transaction.hash,
