@@ -1,7 +1,7 @@
 import "@nomiclabs/hardhat-ethers";
 import { utils } from "ethers";
 import { task } from "hardhat/config";
-import { getBatleContract, getGameItemsContract } from "./helpers";
+import { getGameItemsContract } from "./helpers";
 
 task('players')
   .setAction(async (_, hre) => {
