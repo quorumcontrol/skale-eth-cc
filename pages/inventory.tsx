@@ -22,8 +22,7 @@ export default function Inventory() {
   const onChoose = async (tokenId: number) => {
     setLoading(true);
     try {
-      const { receipt, salt } = await commit.mutateAsync(tokenId);
-      console.log("commit receipt: ", receipt);
+      const { salt } = await commit.mutateAsync(tokenId);
       await router.push(`/battle/${salt}`);
     } finally {
       setLoading(false);

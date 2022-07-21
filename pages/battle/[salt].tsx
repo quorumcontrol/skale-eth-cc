@@ -57,7 +57,7 @@ export default function Battle() {
     )
   }
 
-  if (!commitment || !commitment.isCommitted) {
+  if (!commitment || (!commitment.isCommitted && !commitment.transactionHash)) {
     return (
       <Layout>
         <Text>Looks like you haven&apos;t chosen an item yet.</Text>
