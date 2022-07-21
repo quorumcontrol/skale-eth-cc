@@ -1,4 +1,4 @@
-import { Box, Button, Heading, Spinner, Text } from "@chakra-ui/react";
+import { Box, Button, Spinner, Text } from "@chakra-ui/react";
 import { useAccount } from "wagmi";
 import NextLink from "next/link";
 import { useInventory } from "../src/hooks/useGameItems";
@@ -11,15 +11,7 @@ export default function Home() {
   const { data: tokens, isFetching } = useInventory();
   const isClient = useIsClientSide();
 
-  if (!isClient || !isConnected) {
-    return (
-      <Layout>
-        <Text>Connect your wallet to begin</Text>
-      </Layout>
-    );
-  }
-
-  if (isFetching) {
+  if (isFetching || !isClient) {
     return (
       <Layout>
         <Spinner />
@@ -29,6 +21,9 @@ export default function Home() {
 
   return (
     <Layout>
+      {!isConnected && (
+        <Text>Click Connect Wallet to begin. Burner wallet provides the best experience.</Text>
+      )}
       {isClient && address && tokens?.length === 0 && (
         <NextLink href="/signup">
           <Button>Signup</Button>
@@ -39,7 +34,7 @@ export default function Home() {
           <Button>Play</Button>
         </NextLink>
       )}
-      <Box>
+      <Box mt="2">
         <Video animationUrl="/promoVid.mp4" autoPlay controls muted playsInline></Video>
       </Box>
       <Text>A classic game, reimagined on the zero-gas SKALE network </Text>
