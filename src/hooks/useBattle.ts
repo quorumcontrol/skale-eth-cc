@@ -24,7 +24,7 @@ const gameItemsInterface = GameItems__factory.createInterface()
 const transferSingleTopic = gameItemsInterface.getEventTopic('TransferSingle')
 const tierUnlockedTopic = gameItemsInterface.getEventTopic('TierUnlocked')
 
-const battleContract = memoize((signer:Signer) => {
+const battleContract = memoize((signer:Signer, _address:string) => {
   const addr = addresses().Battle
   return Battle__factory.connect(addr, signer)
 })
@@ -36,7 +36,8 @@ export const useBattleContract = () => {
     if (!signer) {
       return undefined
     }
-    return battleContract(signer)
+    console.log('signer change: ', signer)
+    return battleContract(signer, (signer as any).address)
   }, [signer])
 }
 
@@ -270,6 +271,8 @@ export const useDoCommit = () => {
     if (!battleContract) {
       throw new Error('missing battle contract')
     }
+
+    console.log('battleContract: ', battleContract.signer, address)
 
     const salt = randomBytes(32)
     const commit = solidityKeccak256(['bytes32', 'uint256'], [salt, BigNumber.from(tokenId)])
