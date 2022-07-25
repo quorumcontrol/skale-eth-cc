@@ -7,7 +7,8 @@ import { useCommitment, useDoCommit } from "../src/hooks/useBattle";
 import { useInventory } from "../src/hooks/useGameItems";
 import useIsClientSide from "../src/hooks/useIsClientSide";
 import Layout from "../src/layouts/Layout";
-import { useWaitForTransaction } from "wagmi";
+import { useAccount, useWaitForTransaction } from "wagmi";
+import { useQueryClient } from "react-query";
 
 export default function Inventory() {
   const [loading, setLoading] = useState(false);
@@ -19,8 +20,16 @@ export default function Inventory() {
   } = useCommitment();
   const commit = useDoCommit();
   const router = useRouter();
+  const client = useQueryClient()
+  const { address } = useAccount()
+
   const { transactionHash } = router.query
-  const { data:transactionData } = useWaitForTransaction({ hash: transactionHash as string })
+  const { data:transactionData } = useWaitForTransaction({ hash: transactionHash as string, onSuccess: () => {
+    client.cancelQueries(['inventory', address])
+    client.invalidateQueries(['inventory', address], {
+      refetchInactive: true,
+    })
+  }})
 
   const onChoose = async (tokenId: number) => {
     setLoading(true);
