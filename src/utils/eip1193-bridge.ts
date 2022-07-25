@@ -32,7 +32,6 @@ export class Eip1193Bridge extends EventEmitter {
      }
 
      async send(method: string, params: Array<any>): Promise<any> {
-        console.log("send: ", method, params)
          function throwUnsupported(message: string): never {
              return logger.throwError(message, ethers.utils.Logger.errors.UNSUPPORTED_OPERATION, {
                  method: method,
@@ -86,7 +85,6 @@ export class Eip1193Bridge extends EventEmitter {
                  return await this.provider.sendTransaction(params[0]);
              }
              case "eth_call": {
-                 console.log('eth_call', method, params)
                 //  const req = ethers.providers.JsonRpcProvider.hexlifyTransaction(params[0]);
                  return await this.provider.call(params[0], params[1]);
              }
@@ -136,7 +134,6 @@ export class Eip1193Bridge extends EventEmitter {
 
                 //  const req = ethers.providers.JsonRpcProvider.hexlifyTransaction(params[0]);
 
-                 console.log('sendTransaction: ', params)
                  const {gas, ...txReq} = params[0]
 
                  const tx = await this.signer.sendTransaction({...txReq, gasLimit: gas});

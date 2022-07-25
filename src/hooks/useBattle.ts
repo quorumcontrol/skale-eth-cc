@@ -6,13 +6,14 @@ import { memoize } from "../utils/memoize"
 import { addresses } from "../utils/networkSelector"
 import { useQuery, useMutation, useQueryClient } from 'react-query'
 import { randomBytes } from "crypto"
-import { BytesLike, defaultAbiCoder, solidityKeccak256 } from "ethers/lib/utils"
+import { Bytes, BytesLike, defaultAbiCoder, solidityKeccak256 } from "ethers/lib/utils"
 import {  TypedListener } from "../../contracts/typechain-types/common"
 import { BattleCompletedEvent, SaltUsedEvent } from "../../contracts/typechain-types/contracts/Battle"
 import useWebsocketProvider from "./useWebsocketProvider"
 import { useAllItems } from "./useGameItems"
 import { TierUnlockedEvent, TransferSingleEvent } from "../../contracts/typechain-types/contracts/GameItems"
 import addressExists from "../utils/addressExists"
+import { token } from "../../contracts/typechain-types/@openzeppelin/contracts"
 
 const LOCAL_STORAGE_SALT_KEY = 'bps:salt'
 const LOCAL_STORAGE_TOKEN_KEY = 'bps:tokenId'
@@ -24,7 +25,7 @@ const gameItemsInterface = GameItems__factory.createInterface()
 const transferSingleTopic = gameItemsInterface.getEventTopic('TransferSingle')
 const tierUnlockedTopic = gameItemsInterface.getEventTopic('TierUnlocked')
 
-const battleContract = memoize((signer:Signer) => {
+const battleContract = memoize((signer:Signer, _address:string) => {
   const addr = addresses().Battle
   return Battle__factory.connect(addr, signer)
 })
@@ -36,7 +37,8 @@ export const useBattleContract = () => {
     if (!signer) {
       return undefined
     }
-    return battleContract(signer)
+    console.log('signer change: ', signer)
+    return battleContract(signer, (signer as any).address)
   }, [signer])
 }
 
@@ -217,20 +219,25 @@ export const useDoBattle = () => {
   })
 }
 
-export const useEncodedCommitmentData = () => {
+export const useEncodedCommitmentData = (_transactionHash?:string, tokenId?:number, salt?:BytesLike) => {
   const { address } = useAccount()
-  const { data:commitment } = useCommitment()
 
   return useMemo(() => {
-    if (!address || !commitment || !commitment.isCommitted) {
-      return undefined
+    if (!tokenId || !salt) {
+      return ''
     }
     const encoded = defaultAbiCoder.encode(
       ['address', 'bytes32', 'uint256'],
-      [address, commitment.salt, BigNumber.from(commitment.tokenId)])
-    console.log('encoded', encoded, address, commitment.salt, commitment.tokenId)
+      [address, salt, BigNumber.from(tokenId)])
+    console.log('encoded', encoded, address, salt, tokenId)
     return encoded
-  }, [commitment, address])
+  }, [tokenId, salt, address])
+}
+
+export interface CommitmentData {
+  isCommitted: boolean
+  salt?: BytesLike
+  tokenId? : number
 }
 
 export const useCommitment = () => {
@@ -250,8 +257,8 @@ export const useCommitment = () => {
     return {
       isCommitted,
       salt: storedSalt ? `0x${storedSalt}` : undefined,
-      tokenId: storedTokenId ? parseInt(storedTokenId, 10) : undefined
-    }
+      tokenId: storedTokenId ? parseInt(storedTokenId, 10) : undefined,
+    } as CommitmentData
   }, {
     enabled: isConnected && addressExists(address) && !!battleContract
   })
@@ -269,13 +276,18 @@ export const useDoCommit = () => {
       throw new Error('missing battle contract')
     }
 
+    console.log('battleContract: ', battleContract.signer, address)
+
     const salt = randomBytes(32)
     const commit = solidityKeccak256(['bytes32', 'uint256'], [salt, BigNumber.from(tokenId)])
     console.log('committing: ', commit, salt, tokenId)
-    const tx = await battleContract.commitItem(commit)
-    const receipt = await tx.wait()
-    localStorage.setItem(LOCAL_STORAGE_SALT_KEY, salt.toString('hex'))
-    localStorage.setItem(LOCAL_STORAGE_TOKEN_KEY, tokenId.toString(10))
+    const transaction = await battleContract.commitItem(commit)
+    transaction.wait().then((receipt) => {
+      console.log("tx complete: ", receipt)
+      localStorage.setItem(LOCAL_STORAGE_SALT_KEY, salt.toString('hex'))
+      localStorage.setItem(LOCAL_STORAGE_TOKEN_KEY, tokenId.toString(10))
+    })
+
     client.cancelQueries(commitmentKey)
     client.setQueriesData(commitmentKey, {
       isCommitted: true,
@@ -283,7 +295,7 @@ export const useDoCommit = () => {
       tokenId,
     })
     return {
-      receipt,
+      transactionHash: transaction.hash,
       salt: `0x${salt.toString('hex')}`,
       tokenId,
     }
