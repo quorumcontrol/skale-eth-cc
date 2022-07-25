@@ -33,7 +33,7 @@ export default function Inventory() {
 
   return (
     <Layout>
-      <Text>Find a keymaster to compete for the $2022 prize.</Text>
+      <Text>Find a keymaster to play.</Text>
       <Text>Trouble finding a keymaster?</Text>
       <NextLink href={tweetHref} target="_blank">
         <Button>Tweet for access.</Button>
