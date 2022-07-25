@@ -2,11 +2,11 @@ import { Button, Heading, Spinner, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import NextLink from "next/link";
-import NFTCard from "../../src/components/NFTCard";
-import { useCommitment, useDoCommit } from "../../src/hooks/useBattle";
-import { useInventory } from "../../src/hooks/useGameItems";
-import useIsClientSide from "../../src/hooks/useIsClientSide";
-import Layout from "../../src/layouts/Layout";
+import NFTCard from "../src/components/NFTCard";
+import { useCommitment, useDoCommit } from "../src/hooks/useBattle";
+import { useInventory } from "../src/hooks/useGameItems";
+import useIsClientSide from "../src/hooks/useIsClientSide";
+import Layout from "../src/layouts/Layout";
 import { useWaitForTransaction } from "wagmi";
 
 export default function Inventory() {
