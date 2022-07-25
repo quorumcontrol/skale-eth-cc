@@ -47,6 +47,7 @@ export default function Inventory() {
   if (!isClient || loading || isFetching || commitmentFetching || (transactionHash && !transactionData)) {
     return (
       <Layout>
+        <Text>Fetching your inventory.</Text>
         <Spinner />
       </Layout>
     );
