@@ -2,11 +2,12 @@ import { Button, Heading, Spinner, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import NextLink from "next/link";
-import NFTCard from "../src/components/NFTCard";
-import { useCommitment, useDoCommit } from "../src/hooks/useBattle";
-import { useInventory } from "../src/hooks/useGameItems";
-import useIsClientSide from "../src/hooks/useIsClientSide";
-import Layout from "../src/layouts/Layout";
+import NFTCard from "../../src/components/NFTCard";
+import { useCommitment, useDoCommit } from "../../src/hooks/useBattle";
+import { useInventory } from "../../src/hooks/useGameItems";
+import useIsClientSide from "../../src/hooks/useIsClientSide";
+import Layout from "../../src/layouts/Layout";
+import { useWaitForTransaction } from "wagmi";
 
 export default function Inventory() {
   const [loading, setLoading] = useState(false);
@@ -18,6 +19,8 @@ export default function Inventory() {
   } = useCommitment();
   const commit = useDoCommit();
   const router = useRouter();
+  const { transactionHash } = router.query
+  const { isLoading:transactionIsLoading } = useWaitForTransaction({ hash: transactionHash as string })
 
   const onChoose = async (tokenId: number) => {
     setLoading(true);
@@ -32,7 +35,7 @@ export default function Inventory() {
   const allowItemChoice =
     !commitmentFetching && commitment && !commitment.isCommitted;
 
-  if (!isClient || loading || isFetching || commitmentFetching) {
+  if (!isClient || loading || isFetching || commitmentFetching || transactionIsLoading) {
     return (
       <Layout>
         <Spinner />

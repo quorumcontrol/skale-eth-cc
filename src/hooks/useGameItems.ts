@@ -20,6 +20,20 @@ export const useGameItemsContract = () => {
   }, [provider])
 }
 
+export const useDoSignup = () => {
+  return useMutation(async ({address }: {address: string}) => {
+    const headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+
+    return fetch('/api/signup', {
+      method: 'POST',
+      body: Buffer.from(JSON.stringify({
+        address
+      })),
+    })
+  })
+}
+
 export const useOnSignedUp = (onSignedUp:()=>any) => {
   const { address } = useAccount()
   const gameItems = useGameItemsContract()
