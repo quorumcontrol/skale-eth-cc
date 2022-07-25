@@ -20,7 +20,7 @@ export default function Inventory() {
   const commit = useDoCommit();
   const router = useRouter();
   const { transactionHash } = router.query
-  const { isLoading:transactionIsLoading } = useWaitForTransaction({ hash: transactionHash as string })
+  const { data:transactionData } = useWaitForTransaction({ hash: transactionHash as string })
 
   const onChoose = async (tokenId: number) => {
     setLoading(true);
@@ -35,7 +35,7 @@ export default function Inventory() {
   const allowItemChoice =
     !commitmentFetching && commitment && !commitment.isCommitted;
 
-  if (!isClient || loading || isFetching || commitmentFetching || transactionIsLoading) {
+  if (!isClient || loading || isFetching || commitmentFetching || (transactionHash && !transactionData)) {
     return (
       <Layout>
         <Spinner />
